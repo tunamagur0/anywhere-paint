@@ -10,6 +10,9 @@ export default class AnyWherePaint {
   private start() {
     const pre: { x: number; y: number } = { x: 0, y: 0 };
     let isDrawing: boolean = false;
+
+    this.ctx_.lineCap = "round";
+    this.ctx_.lineJoin = "round";
     this.canvas_.addEventListener("mousedown", e => {
       isDrawing = true;
       pre.x = e.offsetX;
@@ -27,6 +30,21 @@ export default class AnyWherePaint {
         pre.y = y;
       }
     });
+  }
+
+  /**
+   *
+   * @param {number} width line width(px)
+   */
+  public setLineWidth(width: number) {
+    this.ctx_.lineWidth = width;
+  }
+
+  /**
+   * @param {string} color rgb string or hex string
+   */
+  public setLineColor(color: string) {
+    this.ctx_.strokeStyle = color;
   }
 
   private drawLine(

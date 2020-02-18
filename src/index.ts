@@ -5,4 +5,10 @@ const canvas: HTMLCanvasElement = <HTMLCanvasElement>(
 );
 
 const awPaint: AnyWherePaint = new AnyWherePaint(canvas);
-console.log("hello world");
+const button = <HTMLButtonElement>document.getElementById("button");
+button.onclick = () => {
+  const output = <HTMLOutputElement>document.getElementById("output1");
+  const width = parseInt(output.value);
+
+  awPaint.setLineWidth(width);
+};
