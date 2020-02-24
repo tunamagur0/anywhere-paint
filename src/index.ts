@@ -12,3 +12,4 @@ button.onclick = () => {
 
   awPaint.setLineWidth(width);
 };
+awPaint.createColorCircle(<HTMLDivElement>document.getElementById("circle"));

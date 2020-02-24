@@ -1,6 +1,9 @@
+import ColorCircle from "./colorCircle";
+
 export default class AnyWherePaint {
   private canvas_: HTMLCanvasElement;
   private ctx_: CanvasRenderingContext2D;
+  private colorCircle_: ColorCircle | null = null;
   constructor(canvas: HTMLCanvasElement) {
     this.canvas_ = canvas;
     this.ctx_ = <CanvasRenderingContext2D>canvas.getContext("2d");
@@ -41,10 +44,14 @@ export default class AnyWherePaint {
   }
 
   /**
-   * @param {string} color rgb string or hex string
+   * @param {string} color css styled color string
    */
   public setLineColor(color: string) {
     this.ctx_.strokeStyle = color;
+  }
+
+  public createColorCircle(div: HTMLDivElement) {
+    this.colorCircle_ = new ColorCircle(div);
   }
 
   private drawLine(
