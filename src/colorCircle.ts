@@ -16,8 +16,6 @@ export default class ColorCircle {
   constructor(div: HTMLDivElement) {
     this.div_ = div;
     this.div_.style.position = 'relative';
-    this.div_.style.width = '300px';
-    this.div_.style.height = '300px';
 
     this.hueSlider_ = document.createElement('div');
     this.div_.appendChild(this.hueSlider_);
