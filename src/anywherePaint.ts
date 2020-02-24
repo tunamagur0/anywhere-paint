@@ -19,21 +19,24 @@ export default class AnyWherePaint {
     this.ctx_.lineJoin = 'round';
     this.canvas_.addEventListener('mousedown', e => {
       isDrawing = true;
-      pre.x = e.offsetX;
-      pre.y = e.offsetY;
+      const rect: DOMRect = this.canvas_.getBoundingClientRect();
+      const x: number = e.pageX - rect.left;
+      const y: number = e.pageY - rect.top;
+      pre.x = x;
+      pre.y = y;
       if (this.colorCircle_) {
         const color: HSV | RGB = this.colorCircle_.getColor(true);
         if (color) this.ctx_.strokeStyle = color.toString();
-        console.log(color);
       }
     });
-    this.canvas_.addEventListener('mouseup', e => {
+    window.addEventListener('mouseup', e => {
       isDrawing = false;
     });
-    this.canvas_.addEventListener('mousemove', e => {
+    window.addEventListener('mousemove', e => {
       if (isDrawing) {
-        const x: number = e.offsetX;
-        const y: number = e.offsetY;
+        const rect: DOMRect = this.canvas_.getBoundingClientRect();
+        const x: number = e.pageX - rect.left;
+        const y: number = e.pageY - rect.top;
         this.drawLine(pre.x, pre.y, x, y);
         pre.x = x;
         pre.y = y;
