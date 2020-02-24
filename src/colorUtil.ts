@@ -1,13 +1,43 @@
-export interface RGB {
+export interface IRGB {
   r: number;
   g: number;
   b: number;
+  toString(): string;
 }
 
-export interface HSV {
+export interface IHSV {
   h: number;
   s: number;
   v: number;
+}
+
+export class RGB implements IRGB {
+  public r: number;
+  public g: number;
+  public b: number;
+  constructor(r: number, g: number, b: number) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
+  public toString(): string {
+    return `rgb(${this.r}, ${this.g}, ${this.b})`;
+  }
+}
+
+export class HSV implements IHSV {
+  public h: number;
+  public s: number;
+  public v: number;
+  constructor(h: number, s: number, v: number) {
+    this.h = h;
+    this.s = s;
+    this.v = v;
+  }
+  public toString(): string {
+    const rgb = hsv2rgb(new HSV(this.h, this.s, this.v));
+    return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+  }
 }
 
 /**
@@ -16,11 +46,7 @@ export interface HSV {
  * @returns {HSV} h:0-360 s:0-100 v:0-100
  */
 export function rgb2hsv(rgb: RGB): HSV {
-  const ret: HSV = {
-    h: 0,
-    s: 0,
-    v: 0
-  };
+  const ret: HSV = new HSV(0, 0, 0);
   const min = Math.min(rgb.r, rgb.g, rgb.b);
   const max = Math.max(rgb.r, rgb.g, rgb.b);
 
@@ -34,12 +60,13 @@ export function rgb2hsv(rgb: RGB): HSV {
   if (min === rgb.g) {
     ret.h = (60 * (rgb.r - rgb.b)) / (max - min) + 300;
   }
+  ret.h = Math.round(ret.h);
 
   //calculate v
-  ret.v = (max / 255) * 100;
+  ret.v = Math.round((max / 255) * 100);
 
   //calculate s
-  ret.s = ((max - min) / max) * 100;
+  ret.s = Math.round(((max - min) / max) * 100);
   return ret;
 }
 
@@ -51,11 +78,7 @@ export function rgb2hsv(rgb: RGB): HSV {
 export function hsv2rgb(hsv: HSV): RGB {
   const v = hsv.v / 100;
   const s = hsv.s / 100;
-  const ret: RGB = {
-    r: v * (1 - s),
-    g: v * (1 - s),
-    b: v * (1 - s)
-  };
+  const ret: RGB = new RGB(v * (1 - s), v * (1 - s), v * (1 - s));
   const hPrime: number = hsv.h / 60;
   const i: number = Math.floor(hPrime);
   const x: number = v * s * (1 - Math.abs((hPrime % 2) - 1));

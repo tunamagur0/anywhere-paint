@@ -1,21 +1,24 @@
-const path = require("path");
-const contentBase = path.resolve(__dirname, "public");
+const path = require('path');
+const contentBase = path.resolve(__dirname, 'public');
 
 module.exports = {
-  mode: "development",
-  entry: "./src/index.ts",
+  mode: 'development',
+  entry: {
+    index: './src/index.ts',
+    colorRender: './src/colorRender.ts'
+  },
   output: {
     path: contentBase,
-    filename: "bundle.js"
+    filename: '[name].bundle.js'
   },
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: ['.ts', '.js']
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: "ts-loader"
+        use: 'ts-loader'
       }
     ]
   },
