@@ -113,7 +113,7 @@ export default class ColorCircle {
     this.svSlider_.style.position = 'absolute';
     this.svSlider_.style.border = 'solid 1px black';
     this.svSlider_.style.background = 'rgba(255, 255, 255, 0.6)';
-    this.updateSVSlider(0, 100);
+    this.updateSVSlider(100, 100);
 
     let hueFlag = false,
       svFlag = false;

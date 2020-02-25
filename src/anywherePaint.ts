@@ -52,4 +52,12 @@ export default class AnyWherePaint {
   public changeMode(mode: PenStyle | string) {
     this.lineRender_.changeMode(mode);
   }
+
+  public undo() {
+    this.lineRender_.undo();
+  }
+
+  public redo() {
+    this.lineRender_.redo();
+  }
 }

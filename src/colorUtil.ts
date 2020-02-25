@@ -12,28 +12,44 @@ export interface IHSV {
 }
 
 export class RGB implements IRGB {
-  public r: number;
-  public g: number;
-  public b: number;
-  constructor(r: number, g: number, b: number) {
-    this.r = r;
-    this.g = g;
-    this.b = b;
+  public r: number = 0;
+  public g: number = 0;
+  public b: number = 0;
+  constructor(...args: number[]) {
+    if (args.length !== 3) throw new Error('argment num is not 3');
+    this.r = args[0];
+    this.g = args[1];
+    this.b = args[2];
   }
+
+  public *[Symbol.iterator]() {
+    yield this.r;
+    yield this.g;
+    yield this.b;
+  }
+
   public toString(): string {
     return `rgb(${this.r}, ${this.g}, ${this.b})`;
   }
 }
 
 export class HSV implements IHSV {
-  public h: number;
-  public s: number;
-  public v: number;
-  constructor(h: number, s: number, v: number) {
-    this.h = h;
-    this.s = s;
-    this.v = v;
+  public h: number = 0;
+  public s: number = 0;
+  public v: number = 0;
+  constructor(...args: number[]) {
+    if (args.length !== 3) throw new Error('argment num is not 3');
+    this.h = args[0];
+    this.s = args[1];
+    this.v = args[2];
   }
+
+  public *[Symbol.iterator]() {
+    yield this.h;
+    yield this.s;
+    yield this.v;
+  }
+
   public toString(): string {
     const rgb = hsv2rgb(new HSV(this.h, this.s, this.v));
     return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
