@@ -6,6 +6,7 @@ export interface History {
   color: HSV | RGB;
   lineWidth: number;
   snapshot: ImageData | null;
+  layerNum: number;
 }
 
 export class HistoryManager {

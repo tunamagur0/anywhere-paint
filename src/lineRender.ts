@@ -14,17 +14,35 @@ export class LineRender {
   private color_: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0);
   private historyManager_: HistoryManager = new HistoryManager();
   private lineWidth_: number = 1;
+  private layerNum_: number = 0;
   private history_: History = {
     path: [],
     mode: this.mode_,
     color: this.color_,
     lineWidth: this.lineWidth_,
-    snapshot: null
+    snapshot: null,
+    layerNum: this.layerNum_
   };
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    layerNum: number
+  ) {
     this.canvas_ = canvas;
-    this.ctx_ = <CanvasRenderingContext2D>canvas.getContext('2d');
+    this.ctx_ = ctx;
+    this.layerNum_ = layerNum;
+  }
+
+  public selectLayer(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    layerNum: number
+  ) {
+    this.canvas_ = canvas;
+    this.ctx_ = ctx;
+    this.layerNum_ = layerNum;
+    console.log(layerNum);
   }
 
   public changeMode(mode: PenStyle | string) {
@@ -59,6 +77,7 @@ export class LineRender {
       this.canvas_.height
     );
     this.history_.lineWidth = this.lineWidth_;
+    this.history_.layerNum = this.layerNum_;
   }
 
   public update(pos: { x: number; y: number }) {
@@ -84,34 +103,30 @@ export class LineRender {
     this.history_.path.push(pos);
   }
 
-  public end() {
+  public end(): History | null {
+    let ret = null;
     if (this.isDrawing_) {
       this.isDrawing_ = false;
-      this.historyManager_.do(this.history_);
+      ret = { ...this.history_ };
       this.history_.path = [];
     }
+    return ret;
   }
 
-  public undo() {
-    const hist: Array<History> | null = this.historyManager_.undo();
-    if (hist) {
+  public undo(hist: History) {
+    if (hist.snapshot) {
       this.ctx_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
-      this.ctx_.putImageData(<ImageData>hist[0].snapshot, 0, 0);
-
-      for (const h of hist) {
-        this.drawLineByHistory(h);
-      }
+      this.ctx_.putImageData(<ImageData>hist.snapshot, 0, 0);
     }
+
+    this.drawLineByHistory(hist);
   }
 
-  public redo() {
-    const hist: History | null = this.historyManager_.redo();
-    if (hist) {
-      this.drawLineByHistory(hist);
-    }
+  public redo(hist: History) {
+    this.drawLineByHistory(hist);
   }
 
-  public drawLineByHistory(hist: History) {
+  private drawLineByHistory(hist: History) {
     switch (hist.mode) {
       case PenStyle.Pencil:
         this.ctx_.globalCompositeOperation = 'source-over';
