@@ -8,12 +8,12 @@ export default class AnyWherePaint {
   private width_: number;
   private height_: number;
   private colorCircle_: ColorCircle | null = null;
-  private canvasManager: CanvasManager;
+  private canvasManager_: CanvasManager;
   constructor(div: HTMLDivElement, width: number, height: number) {
     this.div_ = div;
     this.width_ = width;
     this.height_ = height;
-    this.canvasManager = new CanvasManager(div, width, height);
+    this.canvasManager_ = new CanvasManager(div, width, height);
   }
 
   /**
@@ -21,39 +21,43 @@ export default class AnyWherePaint {
    * @param {number} width line width(px)
    */
   public setLineWidth(width: number) {
-    this.canvasManager.setLineWidth(width);
+    this.canvasManager_.setLineWidth(width);
   }
 
   public createColorCircle(div: HTMLDivElement) {
     this.colorCircle_ = new ColorCircle(div);
-    this.canvasManager.setColor(this.colorCircle_.getColor(true));
+    this.canvasManager_.setColor(this.colorCircle_.getColor(true));
     window.addEventListener('mouseup', e => {
       if (this.colorCircle_)
-        this.canvasManager.setColor(<HSV>this.colorCircle_.getColor(true));
+        this.canvasManager_.setColor(<HSV>this.colorCircle_.getColor(true));
     });
   }
 
   public changeMode(mode: PenStyle | string) {
-    this.canvasManager.changeMode(mode);
+    this.canvasManager_.changeMode(mode);
   }
 
   public undo() {
-    this.canvasManager.undo();
+    this.canvasManager_.undo();
   }
 
   public redo() {
-    this.canvasManager.redo();
+    this.canvasManager_.redo();
   }
 
   public selectLayer(layerNum: number) {
-    this.canvasManager.selectLayer(layerNum);
+    this.canvasManager_.selectLayer(layerNum);
   }
 
   public addLayer() {
-    this.canvasManager.addLayer();
+    this.canvasManager_.addLayer();
   }
 
   public removeLayer(layerNum: number) {
-    this.canvasManager.removeLayer(layerNum);
+    this.canvasManager_.removeLayer(layerNum);
+  }
+
+  public renameLayer(layerNum: number, layerName: string) {
+    this.canvasManager_.renameLayer(layerNum, layerName);
   }
 }

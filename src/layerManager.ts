@@ -36,7 +36,7 @@ export default class LayerManager {
     return { canvas: canvas, ctx: ctx };
   }
 
-  //returns layerNum
+  //returns maximum layerNum
   public removeLayer(layerNum: number): number | null {
     const canvas: HTMLCanvasElement | undefined = this.layers_.get(layerNum);
     if (canvas) {
@@ -53,6 +53,12 @@ export default class LayerManager {
       ret = Math.max(k, ret);
     }
     return ret;
+  }
+
+  public renameLayer(layerNum: number, layerName: string) {
+    if (this.layerNum2layerName.has(layerNum)) {
+      this.layerNum2layerName.set(layerNum, layerName);
+    }
   }
 
   public getLayers(): {

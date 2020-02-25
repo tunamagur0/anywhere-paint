@@ -30,7 +30,6 @@ export class HistoryManager {
     if ((cnt + 1) % this.snapshotInterval_ !== 0) {
       hist.snapshot = null;
     }
-    console.log(hist.snapshot);
     this.stack_.push(hist);
     this.pointer_++;
   }

@@ -117,4 +117,8 @@ export default class CanvasManager {
   public setColor(color: HSV | RGB) {
     this.color_ = color;
   }
+
+  public renameLayer(layerNum: number, layerName: string) {
+    this.layerManager_.renameLayer(layerNum, layerName);
+  }
 }
