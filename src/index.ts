@@ -13,3 +13,8 @@ button.onclick = () => {
   awPaint.setLineWidth(width);
 };
 awPaint.createColorCircle(<HTMLDivElement>document.getElementById('circle'));
+const checkBox = <HTMLInputElement>document.getElementById('is-eraser');
+checkBox.onchange = e => {
+  const target = <HTMLInputElement>e.target;
+  awPaint.changeMode(target.checked ? 'Eraser' : 'Pencil');
+};
