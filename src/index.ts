@@ -33,3 +33,8 @@ const redo = <HTMLButtonElement>document.getElementById('redo');
 redo.onclick = () => {
   awPaint.redo();
 };
+
+const remove = <HTMLButtonElement>document.getElementById('remove');
+remove.onclick = () => {
+  awPaint.removeLayer(1);
+};

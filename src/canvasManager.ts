@@ -19,6 +19,7 @@ export default class CanvasManager {
     this.historyManager_ = new HistoryManager();
     this.layerManager_ = new LayerManager(this.div_, this.width_, this.height_);
     this.addLayer();
+    this.addLayer();
 
     const layers = this.layerManager_.getLayers();
     const canvas = <HTMLCanvasElement>layers.canvas.get(0);
@@ -42,31 +43,41 @@ export default class CanvasManager {
 
     if (canvas && ctx) {
       this.lineRender_.selectLayer(canvas, ctx, layerNum);
+      this.setEvent(canvas);
     }
   }
 
-  public addLayer() {
-    const { canvas, ctx } = this.layerManager_.addLayer();
-    //only fire most top canvas
-    canvas.addEventListener('mousedown', e => {
+  private setEvent(canvas: HTMLCanvasElement) {
+    canvas.onmousedown = (e: MouseEvent) => {
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.pageX - rect.left;
       const y: number = e.pageY - rect.top;
       this.lineRender_.start({ x: x, y: y }, this.color_);
-    });
-    window.addEventListener('mouseup', e => {
+    };
+    window.onmouseup = (e: MouseEvent) => {
       const hist = this.lineRender_.end();
       if (hist) this.historyManager_.do(hist);
-    });
-    window.addEventListener('mousemove', e => {
+    };
+    window.onmousemove = (e: MouseEvent) => {
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.pageX - rect.left;
       const y: number = e.pageY - rect.top;
       this.lineRender_.update({ x: x, y: y });
-    });
+    };
   }
 
-  public removeLayer(layerNum: number) {}
+  public addLayer() {
+    const { canvas, ctx } = this.layerManager_.addLayer();
+    this.setEvent(canvas);
+  }
+
+  public removeLayer(layerNum: number) {
+    this.historyManager_.removeLayer(layerNum);
+    const num: number | null = this.layerManager_.removeLayer(layerNum);
+    if (num !== null) {
+      this.selectLayer(num);
+    }
+  }
 
   public undo() {
     const hist: Array<History> | null = this.historyManager_.undo();

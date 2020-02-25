@@ -12,6 +12,7 @@ export interface History {
 export class HistoryManager {
   private stack_: Array<History> = [];
   private pointer_: number = 0;
+  private cnts_: Map<number, number> = new Map<number, number>();
   private snapshotInterval_: number = 10;
   constructor() {}
 
@@ -20,10 +21,16 @@ export class HistoryManager {
     if (hist.color instanceof HSV) {
       hist.color = new HSV(...history.color[Symbol.iterator]());
     }
+    let cnt: number | undefined = this.cnts_.get(hist.layerNum);
+    if (cnt === undefined) {
+      cnt = -1;
+    }
+    this.cnts_.set(hist.layerNum, cnt + 1);
     this.stack_ = this.stack_.slice(0, this.pointer_);
-    if (this.pointer_ % this.snapshotInterval_ !== 0) {
+    if ((cnt + 1) % this.snapshotInterval_ !== 0) {
       hist.snapshot = null;
     }
+    console.log(hist.snapshot);
     this.stack_.push(hist);
     this.pointer_++;
   }
@@ -48,5 +55,24 @@ export class HistoryManager {
   public redo(): History | null {
     if (this.pointer_ === this.stack_.length) return null;
     return this.stack_[this.pointer_++];
+  }
+
+  public removeLayer(layerNum: number) {
+    this.cnts_.delete(layerNum);
+    let cnt: number = 0;
+    let diff: number = 0;
+    for (let i = 0; i < this.stack_.length; i++) {
+      if (this.stack_[i].layerNum === layerNum) {
+        this.stack_.splice(i, 1);
+        i--;
+        cnt++;
+        if (i + cnt < this.pointer_) diff++;
+      }
+      // this.stack_.forEach((value, index) => {
+      //   console.log(value.layerNum, index, this.stack_.length);
+      //   }
+      // });
+    }
+    this.pointer_ -= diff;
   }
 }

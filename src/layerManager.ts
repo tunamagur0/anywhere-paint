@@ -36,7 +36,24 @@ export default class LayerManager {
     return { canvas: canvas, ctx: ctx };
   }
 
-  public removeLayer(layerNum: number) {}
+  //returns layerNum
+  public removeLayer(layerNum: number): number | null {
+    const canvas: HTMLCanvasElement | undefined = this.layers_.get(layerNum);
+    if (canvas) {
+      canvas.remove();
+    }
+    this.layers_.delete(layerNum);
+    this.ctxs_.delete(layerNum);
+    this.layerNum2layerName.delete(layerNum);
+
+    if (this.layers_.size === 0) return null;
+
+    let ret = -1;
+    for (const k of this.layers_.keys()) {
+      ret = Math.max(k, ret);
+    }
+    return ret;
+  }
 
   public getLayers(): {
     canvas: Map<Number, HTMLCanvasElement>;

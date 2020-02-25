@@ -48,4 +48,12 @@ export default class AnyWherePaint {
   public selectLayer(layerNum: number) {
     this.canvasManager.selectLayer(layerNum);
   }
+
+  public addLayer() {
+    this.canvasManager.addLayer();
+  }
+
+  public removeLayer(layerNum: number) {
+    this.canvasManager.removeLayer(layerNum);
+  }
 }
