@@ -1,8 +1,7 @@
 import ColorCircle from './colorCircle';
 import { HSV, RGB } from './colorUtil';
-import { LineRender, PenStyle } from './lineRender';
+import { PenStyle } from './lineRender';
 import CanvasManager from './canvasManager';
-import LayerManager from './layerManager';
 
 export default class AnyWherePaint {
   private div_: HTMLDivElement;
@@ -15,33 +14,7 @@ export default class AnyWherePaint {
     this.width_ = width;
     this.height_ = height;
     this.canvasManager = new CanvasManager(div, width, height);
-    // this.start();
   }
-
-  // private start() {
-  //   this.canvas_.addEventListener('mousedown', e => {
-  //     const rect: DOMRect = this.canvas_.getBoundingClientRect();
-  //     const x: number = e.pageX - rect.left;
-  //     const y: number = e.pageY - rect.top;
-  //     if (this.colorCircle_) {
-  //       const color: HSV | RGB = this.colorCircle_.getColor(true);
-  //       if (color) {
-  //         this.lineRender_.start({ x: x, y: y }, color);
-  //       }
-  //     } else {
-  //       this.lineRender_.start({ x: x, y: y });
-  //     }
-  //   });
-  //   window.addEventListener('mouseup', e => {
-  //     this.lineRender_.end();
-  //   });
-  //   window.addEventListener('mousemove', e => {
-  //     const rect: DOMRect = this.canvas_.getBoundingClientRect();
-  //     const x: number = e.pageX - rect.left;
-  //     const y: number = e.pageY - rect.top;
-  //     this.lineRender_.update({ x: x, y: y });
-  //   });
-  // }
 
   /**
    *

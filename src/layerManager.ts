@@ -1,11 +1,17 @@
-import { LineRender } from './lineRender';
-
 export default class LayerManager {
-  private layers_: Array<HTMLCanvasElement> = [];
-  private ctxs_: Array<CanvasRenderingContext2D> = [];
+  private layers_: Map<number, HTMLCanvasElement> = new Map<
+    number,
+    HTMLCanvasElement
+  >();
+  private ctxs_: Map<number, CanvasRenderingContext2D> = new Map<
+    number,
+    CanvasRenderingContext2D
+  >();
+  private layerNum2layerName: Map<number, string> = new Map<number, string>();
   private div_: HTMLDivElement;
   private width_: number;
   private height_: number;
+  private cnt_: number = -1;
   constructor(div: HTMLDivElement, width: number, height: number) {
     this.div_ = div;
     this.width_ = width;
@@ -16,20 +22,25 @@ export default class LayerManager {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
   } {
+    this.cnt_++;
+    const layerName = `layer${this.cnt_}`;
+    this.layerNum2layerName.set(this.cnt_, layerName);
     const canvas = document.createElement('canvas');
     canvas.width = this.width_;
     canvas.height = this.height_;
     canvas.style.position = 'absolute';
     this.div_.appendChild(canvas);
-    this.layers_.push(canvas);
+    this.layers_.set(this.cnt_, canvas);
     const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-    this.ctxs_.push(ctx);
+    this.ctxs_.set(this.cnt_, ctx);
     return { canvas: canvas, ctx: ctx };
   }
 
+  public removeLayer(layerNum: number) {}
+
   public getLayers(): {
-    canvas: Array<HTMLCanvasElement>;
-    ctx: Array<CanvasRenderingContext2D>;
+    canvas: Map<Number, HTMLCanvasElement>;
+    ctx: Map<Number, CanvasRenderingContext2D>;
   } {
     return { canvas: this.layers_, ctx: this.ctxs_ };
   }

@@ -21,7 +21,9 @@ export default class CanvasManager {
     this.addLayer();
 
     const layers = this.layerManager_.getLayers();
-    this.lineRender_ = new LineRender(layers.canvas[0], layers.ctx[0], 0);
+    const canvas = <HTMLCanvasElement>layers.canvas.get(0);
+    const ctx = <CanvasRenderingContext2D>layers.ctx.get(0);
+    this.lineRender_ = new LineRender(canvas, ctx, 0);
     this.selectLayer(0);
   }
 
@@ -35,11 +37,12 @@ export default class CanvasManager {
 
   public selectLayer(layerNum: number) {
     const layers = this.layerManager_.getLayers();
-    this.lineRender_.selectLayer(
-      layers.canvas[layerNum],
-      layers.ctx[layerNum],
-      layerNum
-    );
+    const canvas = layers.canvas.get(layerNum);
+    const ctx = layers.ctx.get(layerNum);
+
+    if (canvas && ctx) {
+      this.lineRender_.selectLayer(canvas, ctx, layerNum);
+    }
   }
 
   public addLayer() {
@@ -63,19 +66,24 @@ export default class CanvasManager {
     });
   }
 
+  public removeLayer(layerNum: number) {}
+
   public undo() {
     const hist: Array<History> | null = this.historyManager_.undo();
-    console.log(hist);
     if (hist) {
-      const layers = this.layerManager_.getLayers();
+      const layers: {
+        canvas: Map<Number, HTMLCanvasElement>;
+        ctx: Map<Number, CanvasRenderingContext2D>;
+      } = this.layerManager_.getLayers();
       for (const h of hist) {
         const layerNum = h.layerNum;
-        this.lineRender_.selectLayer(
-          layers.canvas[layerNum],
-          layers.ctx[layerNum],
-          layerNum
-        );
-        this.lineRender_.undo(h);
+        const canvas = layers.canvas.get(layerNum);
+        const ctx = layers.ctx.get(layerNum);
+
+        if (canvas && ctx) {
+          this.lineRender_.selectLayer(canvas, ctx, layerNum);
+          this.lineRender_.undo(h);
+        }
       }
     }
   }
@@ -85,12 +93,13 @@ export default class CanvasManager {
     if (hist) {
       const layers = this.layerManager_.getLayers();
       const layerNum = hist.layerNum;
-      this.lineRender_.selectLayer(
-        layers.canvas[layerNum],
-        layers.ctx[layerNum],
-        layerNum
-      );
-      this.lineRender_.undo(hist);
+      const canvas = layers.canvas.get(layerNum);
+      const ctx = layers.ctx.get(layerNum);
+
+      if (canvas && ctx) {
+        this.lineRender_.selectLayer(canvas, ctx, layerNum);
+        this.lineRender_.redo(hist);
+      }
     }
   }
 

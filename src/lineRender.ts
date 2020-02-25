@@ -1,5 +1,5 @@
 import * as colorUtil from './colorUtil';
-import { HistoryManager, History } from './historyManager';
+import { History } from './historyManager';
 export enum PenStyle {
   Pencil,
   Eraser
@@ -12,7 +12,6 @@ export class LineRender {
   private mode_: PenStyle = PenStyle.Pencil;
   private pre_: { x: number; y: number } = { x: 0, y: 0 };
   private color_: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0);
-  private historyManager_: HistoryManager = new HistoryManager();
   private lineWidth_: number = 1;
   private layerNum_: number = 0;
   private history_: History = {
@@ -42,7 +41,6 @@ export class LineRender {
     this.canvas_ = canvas;
     this.ctx_ = ctx;
     this.layerNum_ = layerNum;
-    console.log(layerNum);
   }
 
   public changeMode(mode: PenStyle | string) {
