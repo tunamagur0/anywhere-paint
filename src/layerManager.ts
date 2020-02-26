@@ -21,6 +21,7 @@ export default class LayerManager {
   public addLayer(): {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
+    layerNum: number;
   } {
     this.cnt_++;
     const layerName = `layer${this.cnt_}`;
@@ -33,7 +34,7 @@ export default class LayerManager {
     this.layers_.set(this.cnt_, canvas);
     const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
     this.ctxs_.set(this.cnt_, ctx);
-    return { canvas: canvas, ctx: ctx };
+    return { canvas: canvas, ctx: ctx, layerNum: this.cnt_ };
   }
 
   //returns maximum layerNum
@@ -66,5 +67,18 @@ export default class LayerManager {
     ctx: Map<Number, CanvasRenderingContext2D>;
   } {
     return { canvas: this.layers_, ctx: this.ctxs_ };
+  }
+
+  //return Map<layerNum, base64Image>
+  public getLayerImages(): Map<number, string> {
+    const ret: Map<number, string> = new Map<number, string>();
+    for (const [k, v] of this.layers_.entries()) {
+      ret.set(k, v.toDataURL());
+    }
+    return ret;
+  }
+
+  public getLayerNames(): Map<number, string> {
+    return new Map<number, string>(this.layerNum2layerName);
   }
 }

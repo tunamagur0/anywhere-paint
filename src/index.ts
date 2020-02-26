@@ -14,7 +14,7 @@ button.onclick = () => {
 };
 awPaint.createColorCircle(<HTMLDivElement>document.getElementById('circle'));
 const checkBox = <HTMLInputElement>document.getElementById('is-eraser');
-checkBox.onchange = e => {
+checkBox.onclick = e => {
   const target = <HTMLInputElement>e.target;
   awPaint.changeMode(target.checked ? 'Eraser' : 'Pencil');
 };
@@ -34,7 +34,53 @@ redo.onclick = () => {
   awPaint.redo();
 };
 
-const remove = <HTMLButtonElement>document.getElementById('remove');
+let currentLayer = 0;
+const remove = <HTMLButtonElement>document.getElementById('remove-layer');
 remove.onclick = () => {
-  awPaint.removeLayer(1);
+  removeLayerDiv(currentLayer);
 };
+
+const select = <HTMLSelectElement>document.getElementById('select');
+select.addEventListener('change', () => {
+  const selected = <HTMLOptionElement>document.querySelector('option:checked');
+  const val = selected.value;
+  if (val) {
+    awPaint.selectLayer(parseInt(val));
+    currentLayer = parseInt(val);
+  }
+});
+
+const add = <HTMLButtonElement>document.getElementById('add-layer');
+add.onclick = () => {
+  const num: number = awPaint.addLayer();
+  awPaint.selectLayer(num);
+  createLayerOption(num);
+};
+
+const removeLayerDiv = (layerNum: number) => {
+  const num: number | null = awPaint.removeLayer(layerNum);
+  const option = document.querySelector('option:checked');
+  if (!option) return;
+  option.remove();
+  if (num === null) {
+    currentLayer = -1;
+  } else {
+    currentLayer = num;
+    select.childNodes.forEach((v, i) => {
+      if ((<HTMLOptionElement>v).value === num.toString()) {
+        select.selectedIndex = i;
+      }
+    });
+  }
+};
+
+const createLayerOption = (layerNum: number) => {
+  const option = document.createElement('option');
+  option.value = layerNum.toString();
+  option.textContent = layerNum.toString();
+  currentLayer = layerNum;
+  select.appendChild(option);
+  select.selectedIndex = select.childElementCount - 1;
+};
+
+createLayerOption(0);

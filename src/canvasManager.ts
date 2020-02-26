@@ -19,7 +19,6 @@ export default class CanvasManager {
     this.historyManager_ = new HistoryManager();
     this.layerManager_ = new LayerManager(this.div_, this.width_, this.height_);
     this.addLayer();
-    this.addLayer();
 
     const layers = this.layerManager_.getLayers();
     const canvas = <HTMLCanvasElement>layers.canvas.get(0);
@@ -50,8 +49,8 @@ export default class CanvasManager {
   private setEvent(canvas: HTMLCanvasElement) {
     canvas.onmousedown = (e: MouseEvent) => {
       const rect: DOMRect = canvas.getBoundingClientRect();
-      const x: number = e.pageX - rect.left;
-      const y: number = e.pageY - rect.top;
+      const x: number = e.clientX - rect.left;
+      const y: number = e.clientY - rect.top;
       this.lineRender_.start({ x: x, y: y }, this.color_);
     };
     window.onmouseup = (e: MouseEvent) => {
@@ -60,23 +59,26 @@ export default class CanvasManager {
     };
     window.onmousemove = (e: MouseEvent) => {
       const rect: DOMRect = canvas.getBoundingClientRect();
-      const x: number = e.pageX - rect.left;
-      const y: number = e.pageY - rect.top;
+      const x: number = e.clientX - rect.left;
+      const y: number = e.clientY - rect.top;
       this.lineRender_.update({ x: x, y: y });
     };
   }
 
-  public addLayer() {
-    const { canvas, ctx } = this.layerManager_.addLayer();
+  public addLayer(): number {
+    const { canvas, ctx, layerNum } = this.layerManager_.addLayer();
     this.setEvent(canvas);
+    return layerNum;
   }
 
-  public removeLayer(layerNum: number) {
+  //returns layerNum which is automatically selected
+  public removeLayer(layerNum: number): number | null {
     this.historyManager_.removeLayer(layerNum);
     const num: number | null = this.layerManager_.removeLayer(layerNum);
     if (num !== null) {
       this.selectLayer(num);
     }
+    return num;
   }
 
   public undo() {
@@ -120,5 +122,13 @@ export default class CanvasManager {
 
   public renameLayer(layerNum: number, layerName: string) {
     this.layerManager_.renameLayer(layerNum, layerName);
+  }
+
+  public getLayerImages(): Map<number, string> {
+    return this.layerManager_.getLayerImages();
+  }
+
+  public getLayerNames(): Map<number, string> {
+    return this.layerManager_.getLayerNames();
   }
 }

@@ -20,13 +20,18 @@
       step="1"
       oninput="document.getElementById('output1').value=this.value"
     />
-    <output id="output1"></output>
-    <button id="button"></button>
+    <output id="output1">1</output>
+    <button id="button">width</button>
     <input id="is-eraser" type="checkbox" />
-    <button id="undo"></button>
-    <button id="redo"></button>
-    <input id="is-layer1" type="checkbox" />
-    <button id="remove"></button>
+    <button id="undo">undo</button>
+    <button id="redo">redo</button>
+    <div id="layers">
+      <div id="buttons">
+        <button id="add-layer">add-layer</button>
+        <button id="remove-layer">remove-layer</button>
+      </div>
+      <select id="select"></select>
+    </div>
     <script src="index.bundle.js"></script>
   </body>
 </html>

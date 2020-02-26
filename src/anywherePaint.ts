@@ -9,6 +9,8 @@ export default class AnyWherePaint {
   private height_: number;
   private colorCircle_: ColorCircle | null = null;
   private canvasManager_: CanvasManager;
+
+  //automatically create layer 0
   constructor(div: HTMLDivElement, width: number, height: number) {
     this.div_ = div;
     this.width_ = width;
@@ -49,15 +51,23 @@ export default class AnyWherePaint {
     this.canvasManager_.selectLayer(layerNum);
   }
 
-  public addLayer() {
-    this.canvasManager_.addLayer();
+  public addLayer(): number {
+    return this.canvasManager_.addLayer();
   }
 
-  public removeLayer(layerNum: number) {
-    this.canvasManager_.removeLayer(layerNum);
+  public removeLayer(layerNum: number): number | null {
+    return this.canvasManager_.removeLayer(layerNum);
   }
 
   public renameLayer(layerNum: number, layerName: string) {
     this.canvasManager_.renameLayer(layerNum, layerName);
+  }
+
+  public getLayerImages(): Map<number, string> {
+    return this.canvasManager_.getLayerImages();
+  }
+
+  public getLayerNames(): Map<number, string> {
+    return this.canvasManager_.getLayerNames();
   }
 }

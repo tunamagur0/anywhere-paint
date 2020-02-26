@@ -21,12 +21,22 @@ export class HistoryManager {
     if (hist.color instanceof HSV) {
       hist.color = new HSV(...history.color[Symbol.iterator]());
     }
+    //reduce cnts
+    const rest: Array<History> = this.stack_.slice(
+      this.pointer_,
+      this.stack_.length
+    );
+    for (const r of rest) {
+      const num: number | undefined = this.cnts_.get(r.layerNum);
+      if (num !== undefined) this.cnts_.set(r.layerNum, num - 1);
+    }
+    this.stack_ = this.stack_.slice(0, this.pointer_);
+
     let cnt: number | undefined = this.cnts_.get(hist.layerNum);
     if (cnt === undefined) {
       cnt = -1;
     }
     this.cnts_.set(hist.layerNum, cnt + 1);
-    this.stack_ = this.stack_.slice(0, this.pointer_);
     if ((cnt + 1) % this.snapshotInterval_ !== 0) {
       hist.snapshot = null;
     }

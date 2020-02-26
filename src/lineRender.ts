@@ -64,6 +64,7 @@ export class LineRender {
     this.pre_ = pos;
     this.color_ = color;
     this.ctx_.strokeStyle = color.toString();
+    this.ctx_.lineWidth = this.lineWidth_;
 
     this.history_.path.push(pos);
     this.history_.color = color;
