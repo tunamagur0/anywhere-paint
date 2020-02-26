@@ -121,8 +121,8 @@ export default class ColorCircle {
       const centerX: number = this.div_.clientWidth / 2;
       const centerY: number = this.div_.clientHeight / 2;
       const rect: DOMRect = this.div_.getBoundingClientRect();
-      const x: number = e.pageX - rect.left;
-      const y: number = e.pageY - rect.top;
+      const x: number = e.clientX - rect.left;
+      const y: number = e.clientY - rect.top;
       if (
         centerX - this.canvas2div(this.size_ / 2) <= x &&
         x <= centerX + this.canvas2div(this.size_ / 2) &&
@@ -139,8 +139,8 @@ export default class ColorCircle {
         const centerX: number = this.div_.clientWidth / 2;
         const centerY: number = this.div_.clientHeight / 2;
         const rect: DOMRect = this.div_.getBoundingClientRect();
-        const x: number = e.pageX - rect.left - centerX;
-        const y: number = e.pageY - rect.top - centerY;
+        const x: number = e.clientX - rect.left - centerX;
+        const y: number = e.clientY - rect.top - centerY;
         const r: number = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
         const angleC: number = Math.acos(x / r);
         const angleS: number = Math.asin(y / r);
@@ -150,8 +150,8 @@ export default class ColorCircle {
         const centerX: number = this.div_.clientWidth / 2;
         const centerY: number = this.div_.clientHeight / 2;
         const rect: DOMRect = this.div_.getBoundingClientRect();
-        const x: number = e.pageX - rect.left;
-        const y: number = e.pageY - rect.top;
+        const x: number = e.clientX - rect.left;
+        const y: number = e.clientY - rect.top;
         const divSize = this.canvas2div(this.size_);
         const left: number = centerX - divSize / 2;
         const top: number = centerY - divSize / 2;
