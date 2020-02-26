@@ -39,7 +39,6 @@ export default class CanvasManager {
     const layers = this.layerManager_.getLayers();
     const canvas = layers.canvas.get(layerNum);
     const ctx = layers.ctx.get(layerNum);
-
     if (canvas && ctx) {
       this.lineRender_.selectLayer(canvas, ctx, layerNum);
       this.setEvent(canvas);
@@ -83,6 +82,7 @@ export default class CanvasManager {
 
   public undo() {
     const hist: Array<History> | null = this.historyManager_.undo();
+    console.log(hist);
     if (hist) {
       const layers: {
         canvas: Map<Number, HTMLCanvasElement>;

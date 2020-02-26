@@ -47,18 +47,29 @@ export class HistoryManager {
   public undo(): Array<History> | null {
     if (this.pointer_ === 0) return null;
     let tmpP: number = --this.pointer_;
-    while (!this.stack_[tmpP].snapshot) {
-      tmpP--;
-    }
+    const ret: Array<History> = [];
 
-    //return only snapshot
-    if (tmpP === this.pointer_) {
-      const ret: Array<History> = [{ ...this.stack_[this.pointer_] }];
+    //if stack top has snapshot
+    if (
+      this.stack_[this.pointer_].layerNum === this.stack_[tmpP].layerNum &&
+      this.stack_[tmpP].snapshot
+    ) {
+      ret.unshift({ ...this.stack_[tmpP] });
       ret[0].path = [];
       return ret;
     }
 
-    return this.stack_.slice(tmpP, this.pointer_);
+    do {
+      tmpP--;
+      if (this.stack_[this.pointer_].layerNum === this.stack_[tmpP].layerNum) {
+        ret.unshift({ ...this.stack_[tmpP] });
+      }
+    } while (
+      this.stack_[this.pointer_].layerNum !== this.stack_[tmpP].layerNum ||
+      !this.stack_[tmpP].snapshot
+    );
+
+    return ret;
   }
 
   public redo(): History | null {
