@@ -1,5 +1,4 @@
-import { PenStyle } from './lineRender';
-import { HSV, RGB } from './colorUtil';
+import { HSV } from './colorUtil';
 import { History, HistoryTypes } from './historyTypes';
 export class HistoryManager {
   private stack_: Array<History> = [];
@@ -86,5 +85,11 @@ export class HistoryManager {
   public redo(): History | null {
     if (this.pointer_ === this.stack_.length) return null;
     return this.stack_[this.pointer_++];
+  }
+
+  public reset() {
+    this.stack_ = [];
+    this.pointer_ = 0;
+    this.cnts_ = new Map<number, number>();
   }
 }

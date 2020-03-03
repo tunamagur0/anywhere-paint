@@ -137,6 +137,38 @@ export default class LayerManager {
     return ret;
   }
 
+  public redo(hist: LayerHistory): number | null {
+    let ret: number | null = null;
+    switch (hist.info.command) {
+      case 'add':
+        const layerName = `layer${hist.info.layerNum}`;
+        this.layerNum2layerName.set(hist.info.layerNum, layerName);
+        const canvas = document.createElement('canvas');
+        canvas.width = this.width_;
+        canvas.height = this.height_;
+        canvas.style.position = 'absolute';
+        this.div_.appendChild(canvas);
+        this.layers_.set(hist.info.layerNum, canvas);
+        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+        this.ctxs_.set(hist.info.layerNum, ctx);
+        if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
+
+        ret = hist.info.layerNum;
+        break;
+      case 'remove':
+        const param = this.removeLayer(hist.info.layerNum);
+        ret = param ? param.selectedLayerNum : null;
+        break;
+      case 'rename':
+        if (hist.info.layerName)
+          this.renameLayer(hist.info.layerNum, hist.info.layerName[1]);
+        break;
+      default:
+        break;
+    }
+    return ret;
+  }
+
   public getLayers(): {
     canvas: Map<Number, HTMLCanvasElement>;
     ctx: Map<Number, CanvasRenderingContext2D>;

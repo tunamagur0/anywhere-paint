@@ -26,6 +26,7 @@ export default class CanvasManager {
     this.historyManager_ = new HistoryManager();
     this.layerManager_ = new LayerManager(this.div_, this.width_, this.height_);
     this.addLayer();
+    this.historyManager_.reset();
 
     const layers = this.layerManager_.getLayers();
     const canvas = <HTMLCanvasElement>layers.canvas.get(0);
@@ -139,14 +140,29 @@ export default class CanvasManager {
   public redo() {
     const hist: History | null = this.historyManager_.redo();
     if (hist) {
-      const layers = this.layerManager_.getLayers();
-      const layerNum = hist.info.layerNum;
-      const canvas = layers.canvas.get(layerNum);
-      const ctx = layers.ctx.get(layerNum);
+      switch (hist.target) {
+        case HistoryTypes.LINE_HISTORY:
+          const layers = this.layerManager_.getLayers();
+          const layerNum = hist.info.layerNum;
+          const canvas = layers.canvas.get(layerNum);
+          const ctx = layers.ctx.get(layerNum);
 
-      if (canvas && ctx) {
-        this.lineRender_.selectLayer(canvas, ctx, layerNum);
-        // this.lineRender_.redo(hist);
+          if (canvas && ctx) {
+            this.lineRender_.selectLayer(canvas, ctx, layerNum);
+            this.lineRender_.redo(hist);
+          }
+          break;
+        case HistoryTypes.LAYER_HISTORY:
+          const ret: number | null = this.layerManager_.redo(hist);
+          if (hist.info.command === 'remove') {
+            this.selectLayer(<number>ret);
+          }
+          if (hist.info.command === 'add') {
+            this.selectLayer(hist.info.layerNum);
+          }
+          break;
+        default:
+          break;
       }
     }
   }
