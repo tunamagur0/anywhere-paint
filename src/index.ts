@@ -28,10 +28,14 @@ layer.onchange = e => {
 const undo = <HTMLButtonElement>document.getElementById('undo');
 undo.onclick = () => {
   awPaint.undo();
+  currentLayer = awPaint.selectingLayer;
+  selectLayer();
 };
 const redo = <HTMLButtonElement>document.getElementById('redo');
 redo.onclick = () => {
   awPaint.redo();
+  currentLayer = awPaint.selectingLayer;
+  selectLayer();
 };
 
 let currentLayer = 0;
@@ -66,11 +70,20 @@ const removeLayerDiv = (layerNum: number) => {
     currentLayer = -1;
   } else {
     currentLayer = num;
-    select.childNodes.forEach((v, i) => {
-      if ((<HTMLOptionElement>v).value === num.toString()) {
-        select.selectedIndex = i;
-      }
-    });
+    selectLayer();
+  }
+};
+
+const selectLayer = () => {
+  let flag = true;
+  select.childNodes.forEach((v, i) => {
+    if ((<HTMLOptionElement>v).value === currentLayer.toString()) {
+      select.selectedIndex = i;
+      flag = false;
+    }
+  });
+  if (flag) {
+    createLayerOption(currentLayer);
   }
 };
 

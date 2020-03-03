@@ -1,14 +1,6 @@
 import { PenStyle } from './lineRender';
 import { HSV, RGB } from './colorUtil';
-export interface History {
-  path: Array<{ x: number; y: number }>;
-  mode: PenStyle;
-  color: HSV | RGB;
-  lineWidth: number;
-  snapshot: ImageData | null;
-  layerNum: number;
-}
-
+import { History, HistoryTypes } from './historyTypes';
 export class HistoryManager {
   private stack_: Array<History> = [];
   private pointer_: number = 0;
@@ -17,28 +9,39 @@ export class HistoryManager {
   constructor() {}
 
   public do(history: History) {
-    const hist = { ...history };
-    if (hist.color instanceof HSV) {
-      hist.color = new HSV(...history.color[Symbol.iterator]());
-    }
-    //reduce cnts
-    const rest: Array<History> = this.stack_.slice(
-      this.pointer_,
-      this.stack_.length
-    );
-    for (const r of rest) {
-      const num: number | undefined = this.cnts_.get(r.layerNum);
-      if (num !== undefined) this.cnts_.set(r.layerNum, num - 1);
-    }
-    this.stack_ = this.stack_.slice(0, this.pointer_);
+    const hist: History = { ...history };
+    hist.info = {
+      ...history.info
+    };
+    switch (hist.target) {
+      case HistoryTypes.LINE_HISTORY:
+        if (hist.info.color instanceof HSV) {
+          hist.info.color = new HSV(...hist.info.color[Symbol.iterator]());
+        }
+        //reduce cnts
+        const rest: Array<History> = this.stack_.slice(
+          this.pointer_,
+          this.stack_.length
+        );
+        for (const r of rest) {
+          const num: number | undefined = this.cnts_.get(r.info.layerNum);
+          if (num !== undefined) this.cnts_.set(r.info.layerNum, num - 1);
+        }
+        this.stack_ = this.stack_.slice(0, this.pointer_);
 
-    let cnt: number | undefined = this.cnts_.get(hist.layerNum);
-    if (cnt === undefined) {
-      cnt = -1;
-    }
-    this.cnts_.set(hist.layerNum, cnt + 1);
-    if ((cnt + 1) % this.snapshotInterval_ !== 0) {
-      hist.snapshot = null;
+        let cnt: number | undefined = this.cnts_.get(hist.info.layerNum);
+        if (cnt === undefined) {
+          cnt = -1;
+        }
+        this.cnts_.set(hist.info.layerNum, cnt + 1);
+        if ((cnt + 1) % this.snapshotInterval_ !== 0) {
+          hist.info.snapshot = null;
+        }
+        break;
+      case HistoryTypes.LAYER_HISTORY:
+        break;
+      default:
+        break;
     }
     this.stack_.push(hist);
     this.pointer_++;
@@ -48,51 +51,40 @@ export class HistoryManager {
     if (this.pointer_ === 0) return null;
     let tmpP: number = --this.pointer_;
     const ret: Array<History> = [];
-
-    //if stack top has snapshot
-    if (
-      this.stack_[this.pointer_].layerNum === this.stack_[tmpP].layerNum &&
-      this.stack_[tmpP].snapshot
-    ) {
-      ret.unshift({ ...this.stack_[tmpP] });
-      ret[0].path = [];
-      return ret;
+    const top: History = { ...this.stack_[this.pointer_] };
+    top.info = { ...this.stack_[this.pointer_].info };
+    switch (top.target) {
+      case HistoryTypes.LINE_HISTORY:
+        //if stack top has snapshot
+        if (top.info.snapshot) {
+          top.info.path = [];
+          ret.unshift({ ...top, info: { ...top.info } });
+          break;
+        }
+        do {
+          tmpP--;
+          const current: History = { ...this.stack_[tmpP] };
+          current.info = { ...this.stack_[tmpP].info };
+          if (current.target === HistoryTypes.LINE_HISTORY) {
+            if (top.info.layerNum === current.info.layerNum)
+              ret.unshift(current);
+            if (current.info.snapshot) {
+              break;
+            }
+          }
+        } while (true);
+        break;
+      case HistoryTypes.LAYER_HISTORY:
+        ret.unshift(top);
+        break;
+      default:
+        break;
     }
-
-    do {
-      tmpP--;
-      if (this.stack_[this.pointer_].layerNum === this.stack_[tmpP].layerNum) {
-        ret.unshift({ ...this.stack_[tmpP] });
-      }
-    } while (
-      this.stack_[this.pointer_].layerNum !== this.stack_[tmpP].layerNum ||
-      !this.stack_[tmpP].snapshot
-    );
-
     return ret;
   }
 
   public redo(): History | null {
     if (this.pointer_ === this.stack_.length) return null;
     return this.stack_[this.pointer_++];
-  }
-
-  public removeLayer(layerNum: number) {
-    this.cnts_.delete(layerNum);
-    let cnt: number = 0;
-    let diff: number = 0;
-    for (let i = 0; i < this.stack_.length; i++) {
-      if (this.stack_[i].layerNum === layerNum) {
-        this.stack_.splice(i, 1);
-        i--;
-        cnt++;
-        if (i + cnt < this.pointer_) diff++;
-      }
-      // this.stack_.forEach((value, index) => {
-      //   console.log(value.layerNum, index, this.stack_.length);
-      //   }
-      // });
-    }
-    this.pointer_ -= diff;
   }
 }

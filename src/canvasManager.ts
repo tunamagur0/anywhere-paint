@@ -1,7 +1,13 @@
 import LayerManager from './layerManager';
-import { History, HistoryManager } from './historyManager';
+import { HistoryManager } from './historyManager';
 import { LineRender, PenStyle } from './lineRender';
 import { HSV, RGB } from './colorUtil';
+import {
+  LayerHistory,
+  HistoryTypes,
+  LineHistory,
+  History
+} from './historyTypes';
 
 export default class CanvasManager {
   private div_: HTMLDivElement;
@@ -11,6 +17,7 @@ export default class CanvasManager {
   private historyManager_: HistoryManager;
   private lineRender_: LineRender;
   private color_: HSV | RGB = new HSV(0, 0, 0);
+  private selectingLayer_ = 0;
 
   constructor(div: HTMLDivElement, width: number, height: number) {
     this.div_ = div;
@@ -41,8 +48,13 @@ export default class CanvasManager {
     const ctx = layers.ctx.get(layerNum);
     if (canvas && ctx) {
       this.lineRender_.selectLayer(canvas, ctx, layerNum);
+      this.selectingLayer_ = layerNum;
       this.setEvent(canvas);
     }
+  }
+
+  public get selectingLayer() {
+    return this.selectingLayer_;
   }
 
   private setEvent(canvas: HTMLCanvasElement) {
@@ -65,38 +77,61 @@ export default class CanvasManager {
   }
 
   public addLayer(): number {
-    const { canvas, ctx, layerNum } = this.layerManager_.addLayer();
+    const { canvas, ctx, layerNum, history } = this.layerManager_.addLayer();
+    this.historyManager_.do(history);
     this.setEvent(canvas);
     return layerNum;
   }
 
   //returns layerNum which is automatically selected
+  //return -1 when there is no layer
   public removeLayer(layerNum: number): number | null {
-    this.historyManager_.removeLayer(layerNum);
-    const num: number | null = this.layerManager_.removeLayer(layerNum);
-    if (num !== null) {
-      this.selectLayer(num);
+    const ret: {
+      selectedLayerNum: number;
+      history: LayerHistory;
+    } | null = this.layerManager_.removeLayer(layerNum);
+    if (ret === null) {
+      return null;
     }
-    return num;
+
+    this.selectLayer(ret.selectedLayerNum);
+    this.historyManager_.do(ret.history);
+    return ret.selectedLayerNum;
   }
 
   public undo() {
-    const hist: Array<History> | null = this.historyManager_.undo();
-    console.log(hist);
+    const hist: History[] | null = this.historyManager_.undo();
     if (hist) {
-      const layers: {
-        canvas: Map<Number, HTMLCanvasElement>;
-        ctx: Map<Number, CanvasRenderingContext2D>;
-      } = this.layerManager_.getLayers();
-      for (const h of hist) {
-        const layerNum = h.layerNum;
-        const canvas = layers.canvas.get(layerNum);
-        const ctx = layers.ctx.get(layerNum);
+      const top: History = hist[0];
+      switch (top.target) {
+        case HistoryTypes.LINE_HISTORY:
+          const layers: {
+            canvas: Map<Number, HTMLCanvasElement>;
+            ctx: Map<Number, CanvasRenderingContext2D>;
+          } = this.layerManager_.getLayers();
+          for (const h of hist) {
+            const layerNum = h.info.layerNum;
+            const canvas = layers.canvas.get(layerNum);
+            const ctx = layers.ctx.get(layerNum);
 
-        if (canvas && ctx) {
-          this.lineRender_.selectLayer(canvas, ctx, layerNum);
-          this.lineRender_.undo(h);
-        }
+            if (canvas && ctx) {
+              this.lineRender_.selectLayer(canvas, ctx, layerNum);
+              this.lineRender_.undo(<LineHistory>h);
+            }
+          }
+          break;
+
+        case HistoryTypes.LAYER_HISTORY:
+          const ret: number | null = this.layerManager_.undo(top);
+          if (top.info.command === 'add') {
+            this.selectLayer(<number>ret);
+          }
+          if (top.info.command === 'remove') {
+            this.selectLayer(top.info.layerNum);
+          }
+          break;
+        default:
+          break;
       }
     }
   }
@@ -105,13 +140,13 @@ export default class CanvasManager {
     const hist: History | null = this.historyManager_.redo();
     if (hist) {
       const layers = this.layerManager_.getLayers();
-      const layerNum = hist.layerNum;
+      const layerNum = hist.info.layerNum;
       const canvas = layers.canvas.get(layerNum);
       const ctx = layers.ctx.get(layerNum);
 
       if (canvas && ctx) {
         this.lineRender_.selectLayer(canvas, ctx, layerNum);
-        this.lineRender_.redo(hist);
+        // this.lineRender_.redo(hist);
       }
     }
   }

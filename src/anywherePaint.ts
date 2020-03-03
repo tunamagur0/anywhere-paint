@@ -47,6 +47,10 @@ export default class AnyWherePaint {
     this.canvasManager_.redo();
   }
 
+  public get selectingLayer() {
+    return this.canvasManager_.selectingLayer;
+  }
+
   public selectLayer(layerNum: number) {
     this.canvasManager_.selectLayer(layerNum);
   }
