@@ -26,7 +26,6 @@ export class HistoryManager {
           const num: number | undefined = this.cnts_.get(r.info.layerNum);
           if (num !== undefined) this.cnts_.set(r.info.layerNum, num - 1);
         }
-        this.stack_ = this.stack_.slice(0, this.pointer_);
 
         let cnt: number | undefined = this.cnts_.get(hist.info.layerNum);
         if (cnt === undefined) {
@@ -42,6 +41,8 @@ export class HistoryManager {
       default:
         break;
     }
+
+    this.stack_ = this.stack_.slice(0, this.pointer_);
     this.stack_.push(hist);
     this.pointer_++;
   }
