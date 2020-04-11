@@ -112,10 +112,19 @@ awPaint.selectingLayer
 
 layerNum which is selecting.
 
+## TypeScript
+
+Write this in tsconfig.json.
+
+```
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+    }
+}
+```
+
 # Lisence
 
 MIT
-
-```
-
-```

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "strict": true,
@@ -9,6 +9,7 @@
     "sourceMap": true,
     "pretty": true,
     "newLine": "lf",
-    "outDir": "dist"
+    "outDir": "dist",
+    "lib": ["DOM", "ES6"]
   }
 }

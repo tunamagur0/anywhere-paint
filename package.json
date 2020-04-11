@@ -8,7 +8,8 @@
   "files": [
     "lib",
     "README.md",
-    "pacakge.json"
+    "pacakge.json",
+    "doc"
   ],
   "scripts": {
     "build": "npx webpack",
