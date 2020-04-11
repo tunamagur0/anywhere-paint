@@ -1,28 +1,30 @@
-export interface IRGB {
+/* eslint-disable max-classes-per-file */
+interface RGBInterFace {
   r: number;
   g: number;
   b: number;
   toString(): string;
 }
 
-export interface IHSV {
+interface HSVInterface {
   h: number;
   s: number;
   v: number;
 }
 
-export class RGB implements IRGB {
-  public r: number = 0;
-  public g: number = 0;
-  public b: number = 0;
+export class RGB implements RGBInterFace {
+  public r = 0;
+
+  public g = 0;
+
+  public b = 0;
+
   constructor(...args: number[]) {
     if (args.length !== 3) throw new Error('argment num is not 3');
-    this.r = args[0];
-    this.g = args[1];
-    this.b = args[2];
+    [this.r, this.g, this.b] = args;
   }
 
-  public *[Symbol.iterator]() {
+  public *[Symbol.iterator](): Generator<number, void, void> {
     yield this.r;
     yield this.g;
     yield this.b;
@@ -31,59 +33,6 @@ export class RGB implements IRGB {
   public toString(): string {
     return `rgb(${this.r}, ${this.g}, ${this.b})`;
   }
-}
-
-export class HSV implements IHSV {
-  public h: number = 0;
-  public s: number = 0;
-  public v: number = 0;
-  constructor(...args: number[]) {
-    if (args.length !== 3) throw new Error('argment num is not 3');
-    this.h = args[0];
-    this.s = args[1];
-    this.v = args[2];
-  }
-
-  public *[Symbol.iterator]() {
-    yield this.h;
-    yield this.s;
-    yield this.v;
-  }
-
-  public toString(): string {
-    const rgb = hsv2rgb(new HSV(this.h, this.s, this.v));
-    return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-  }
-}
-
-/**
- *
- * @param {RGB} rgb rgb 0-255
- * @returns {HSV} h:0-360 s:0-100 v:0-100
- */
-export function rgb2hsv(rgb: RGB): HSV {
-  const ret: HSV = new HSV(0, 0, 0);
-  const min = Math.min(rgb.r, rgb.g, rgb.b);
-  const max = Math.max(rgb.r, rgb.g, rgb.b);
-
-  //calculate h
-  if (min === rgb.b) {
-    ret.h = (60 * (rgb.g - rgb.r)) / (max - min) + 60;
-  }
-  if (min === rgb.r) {
-    ret.h = (60 * (rgb.b - rgb.g)) / (max - min) + 180;
-  }
-  if (min === rgb.g) {
-    ret.h = (60 * (rgb.r - rgb.b)) / (max - min) + 300;
-  }
-  ret.h = Math.round(ret.h);
-
-  //calculate v
-  ret.v = Math.round((max / 255) * 100);
-
-  //calculate s
-  ret.s = Math.round(((max - min) / max) * 100);
-  return ret;
 }
 
 /**
@@ -124,9 +73,64 @@ export function hsv2rgb(hsv: HSV): RGB {
       ret.r += v * s;
       ret.b += x;
       break;
+    default:
+      break;
   }
   ret.r = Math.round(ret.r * 255);
   ret.g = Math.round(ret.g * 255);
   ret.b = Math.round(ret.b * 255);
+  return ret;
+}
+
+export class HSV implements HSVInterface {
+  public h = 0;
+
+  public s = 0;
+
+  public v = 0;
+
+  constructor(...args: number[]) {
+    if (args.length !== 3) throw new Error('argment num is not 3');
+    [this.h, this.s, this.v] = args;
+  }
+
+  public *[Symbol.iterator](): Generator<number, void, void> {
+    yield this.h;
+    yield this.s;
+    yield this.v;
+  }
+
+  public toString(): string {
+    const rgb = hsv2rgb(new HSV(this.h, this.s, this.v));
+    return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+  }
+}
+/**
+ *
+ * @param {RGB} rgb rgb 0-255
+ * @returns {HSV} h:0-360 s:0-100 v:0-100
+ */
+export function rgb2hsv(rgb: RGB): HSV {
+  const ret: HSV = new HSV(0, 0, 0);
+  const min = Math.min(rgb.r, rgb.g, rgb.b);
+  const max = Math.max(rgb.r, rgb.g, rgb.b);
+
+  // calculate h
+  if (min === rgb.b) {
+    ret.h = (60 * (rgb.g - rgb.r)) / (max - min) + 60;
+  }
+  if (min === rgb.r) {
+    ret.h = (60 * (rgb.b - rgb.g)) / (max - min) + 180;
+  }
+  if (min === rgb.g) {
+    ret.h = (60 * (rgb.r - rgb.b)) / (max - min) + 300;
+  }
+  ret.h = Math.round(ret.h);
+
+  // calculate v
+  ret.v = Math.round((max / 255) * 100);
+
+  // calculate s
+  ret.s = Math.round(((max - min) / max) * 100);
   return ret;
 }

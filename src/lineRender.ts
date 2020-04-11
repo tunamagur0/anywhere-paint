@@ -1,29 +1,38 @@
 import * as colorUtil from './colorUtil';
 import { LineHistory, HistoryTypes } from './historyTypes';
+
 export enum PenStyle {
   Pencil,
-  Eraser
+  Eraser,
 }
 
 export class LineRender {
-  private canvas_: HTMLCanvasElement;
-  private ctx_: CanvasRenderingContext2D;
-  private isDrawing_: boolean = false;
-  private mode_: PenStyle = PenStyle.Pencil;
-  private pre_: { x: number; y: number } = { x: 0, y: 0 };
-  private color_: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0);
-  private lineWidth_: number = 1;
-  private layerNum_: number = 0;
-  private history_: LineHistory = {
+  private canvas: HTMLCanvasElement;
+
+  private ctx: CanvasRenderingContext2D;
+
+  private isDrawing = false;
+
+  private mode: PenStyle = PenStyle.Pencil;
+
+  private pre: { x: number; y: number } = { x: 0, y: 0 };
+
+  private color: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0);
+
+  private lineWidth = 1;
+
+  private layerNum = 0;
+
+  private history: LineHistory = {
     target: HistoryTypes.LINE_HISTORY,
     info: {
       path: [],
-      mode: this.mode_,
-      color: this.color_,
-      lineWidth: this.lineWidth_,
+      mode: this.mode,
+      color: this.color,
+      lineWidth: this.lineWidth,
       snapshot: null,
-      layerNum: this.layerNum_
-    }
+      layerNum: this.layerNum,
+    },
   };
 
   constructor(
@@ -31,126 +40,127 @@ export class LineRender {
     ctx: CanvasRenderingContext2D,
     layerNum: number
   ) {
-    this.canvas_ = canvas;
-    this.ctx_ = ctx;
-    this.layerNum_ = layerNum;
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.layerNum = layerNum;
   }
 
   public selectLayer(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     layerNum: number
-  ) {
-    this.canvas_ = canvas;
-    this.ctx_ = ctx;
-    this.layerNum_ = layerNum;
+  ): void {
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.layerNum = layerNum;
   }
 
-  public changeMode(mode: PenStyle | string) {
+  public changeMode(mode: PenStyle | string): void {
     const tmp: PenStyle | undefined = (PenStyle as any)[mode];
     if (tmp !== undefined) {
-      this.mode_ = tmp;
+      this.mode = tmp;
     }
   }
 
-  public setWidth(width: number) {
-    this.ctx_.lineWidth = this.lineWidth_ = width;
+  public setWidth(width: number): void {
+    this.ctx.lineWidth = width;
+    this.lineWidth = width;
   }
 
   public start(
     pos: { x: number; y: number },
     color: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0)
-  ) {
-    this.ctx_.lineCap = 'round';
-    this.ctx_.lineJoin = 'round';
-    this.isDrawing_ = true;
-    this.pre_ = pos;
-    this.color_ = color;
-    this.ctx_.strokeStyle = color.toString();
-    this.ctx_.lineWidth = this.lineWidth_;
+  ): void {
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
+    this.isDrawing = true;
+    this.pre = pos;
+    this.color = color;
+    this.ctx.strokeStyle = color.toString();
+    this.ctx.lineWidth = this.lineWidth;
 
-    this.history_.info.path.push(pos);
-    this.history_.info.color = color;
-    this.history_.info.mode = this.mode_;
-    this.history_.info.snapshot = this.ctx_.getImageData(
+    this.history.info.path.push(pos);
+    this.history.info.color = color;
+    this.history.info.mode = this.mode;
+    this.history.info.snapshot = this.ctx.getImageData(
       0,
       0,
-      this.canvas_.width,
-      this.canvas_.height
+      this.canvas.width,
+      this.canvas.height
     );
-    this.history_.info.lineWidth = this.lineWidth_;
-    this.history_.info.layerNum = this.layerNum_;
+    this.history.info.lineWidth = this.lineWidth;
+    this.history.info.layerNum = this.layerNum;
   }
 
-  public update(pos: { x: number; y: number }) {
-    if (!this.isDrawing_) return;
+  public update(pos: { x: number; y: number }): void {
+    if (!this.isDrawing) return;
 
-    switch (this.mode_) {
+    switch (this.mode) {
       case PenStyle.Pencil:
-        this.ctx_.globalCompositeOperation = 'source-over';
+        this.ctx.globalCompositeOperation = 'source-over';
         break;
       case PenStyle.Eraser:
-        this.ctx_.globalCompositeOperation = 'destination-out';
+        this.ctx.globalCompositeOperation = 'destination-out';
         break;
       default:
-        this.ctx_.globalCompositeOperation = 'source-over';
+        this.ctx.globalCompositeOperation = 'source-over';
         break;
     }
 
-    this.ctx_.beginPath();
-    this.ctx_.moveTo(this.pre_.x, this.pre_.y);
-    this.ctx_.lineTo(pos.x, pos.y);
-    this.ctx_.stroke();
-    this.pre_ = pos;
-    this.history_.info.path.push(pos);
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.pre.x, this.pre.y);
+    this.ctx.lineTo(pos.x, pos.y);
+    this.ctx.stroke();
+    this.pre = pos;
+    this.history.info.path.push(pos);
   }
 
   public end(): LineHistory | null {
     let ret = null;
-    if (this.isDrawing_) {
-      this.isDrawing_ = false;
-      ret = { ...this.history_ };
-      ret.info = { ...this.history_.info };
-      this.history_.info.path = [];
+    if (this.isDrawing) {
+      this.isDrawing = false;
+      ret = { ...this.history };
+      ret.info = { ...this.history.info };
+      this.history.info.path = [];
     }
     return ret;
   }
 
-  public undo(hist: LineHistory) {
+  public undo(hist: LineHistory): void {
     if (hist.info.snapshot) {
-      this.ctx_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
-      this.ctx_.putImageData(<ImageData>hist.info.snapshot, 0, 0);
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.putImageData(hist.info.snapshot as ImageData, 0, 0);
     }
 
     this.drawLineByHistory(hist);
   }
 
-  public redo(hist: LineHistory) {
+  public redo(hist: LineHistory): void {
     this.drawLineByHistory(hist);
   }
 
-  private drawLineByHistory(hist: LineHistory) {
+  private drawLineByHistory(hist: LineHistory): void {
     switch (hist.info.mode) {
       case PenStyle.Pencil:
-        this.ctx_.globalCompositeOperation = 'source-over';
+        this.ctx.globalCompositeOperation = 'source-over';
         break;
       case PenStyle.Eraser:
-        this.ctx_.globalCompositeOperation = 'destination-out';
+        this.ctx.globalCompositeOperation = 'destination-out';
         break;
       default:
-        this.ctx_.globalCompositeOperation = 'source-over';
+        this.ctx.globalCompositeOperation = 'source-over';
         break;
     }
-    this.ctx_.strokeStyle = hist.info.color.toString();
-    this.ctx_.lineWidth = hist.info.lineWidth;
-    this.ctx_.lineCap = 'round';
-    this.ctx_.lineJoin = 'round';
+    this.ctx.strokeStyle = hist.info.color.toString();
+    this.ctx.lineWidth = hist.info.lineWidth;
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
 
-    this.ctx_.beginPath();
-    for (let i = 0; i < hist.info.path.length - 1; i++) {
-      this.ctx_.moveTo(hist.info.path[i].x, hist.info.path[i].y);
-      this.ctx_.lineTo(hist.info.path[i + 1].x, hist.info.path[i + 1].y);
+    this.ctx.beginPath();
+    for (let i = 0; i < hist.info.path.length - 1; i += 1) {
+      this.ctx.moveTo(hist.info.path[i].x, hist.info.path[i].y);
+      this.ctx.lineTo(hist.info.path[i + 1].x, hist.info.path[i + 1].y);
     }
-    this.ctx_.stroke();
+    this.ctx.stroke();
   }
 }

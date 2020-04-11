@@ -3,7 +3,7 @@ import { HSV, RGB } from './colorUtil';
 
 export enum HistoryTypes {
   LINE_HISTORY = 'LINE_HISTORY',
-  LAYER_HISTORY = 'LAYER_HISTORY'
+  LAYER_HISTORY = 'LAYER_HISTORY',
 }
 
 export interface LineHistory {

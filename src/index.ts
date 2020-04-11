@@ -1,66 +1,72 @@
-import AnyWherePaint from './anywherePaint';
+import AnywherePaint from './anywherePaint';
 
-const canvas: HTMLDivElement = <HTMLDivElement>(
-  document.getElementById('canvas')
-);
+const canvas: HTMLDivElement = document.getElementById(
+  'canvas'
+) as HTMLDivElement;
 
-const awPaint: AnyWherePaint = new AnyWherePaint(canvas, 600, 400);
-const button = <HTMLButtonElement>document.getElementById('button');
+const awPaint: AnywherePaint = new AnywherePaint(canvas, 600, 400);
+let currentLayer = 0;
+
+const button = document.getElementById('button') as HTMLButtonElement;
 button.onclick = () => {
-  const output = <HTMLOutputElement>document.getElementById('output1');
-  const width = parseInt(output.value);
+  const output = document.getElementById('output1') as HTMLOutputElement;
+  const width = parseInt(output.value, 10);
 
   awPaint.setLineWidth(width);
 };
-awPaint.createColorCircle(<HTMLDivElement>document.getElementById('circle'));
-const checkBox = <HTMLInputElement>document.getElementById('is-eraser');
-checkBox.onclick = e => {
-  const target = <HTMLInputElement>e.target;
+awPaint.createColorCircle(document.getElementById('circle') as HTMLDivElement);
+const checkBox = document.getElementById('is-eraser') as HTMLInputElement;
+checkBox.onclick = (e) => {
+  const target = e.target as HTMLInputElement;
   awPaint.changeMode(target.checked ? 'Eraser' : 'Pencil');
 };
 
-const layer = <HTMLInputElement>document.getElementById('is-eraser');
-layer.onchange = e => {
-  const target = <HTMLInputElement>e.target;
+const layer = document.getElementById('is-eraser') as HTMLInputElement;
+layer.onchange = (e) => {
+  const target = e.target as HTMLInputElement;
   awPaint.selectLayer(target.checked ? 1 : 0);
 };
 
-const undo = <HTMLButtonElement>document.getElementById('undo');
+const select = document.getElementById('select') as HTMLSelectElement;
+
+const createLayerOption = (layerNum: number) => {
+  const option = document.createElement('option');
+  option.value = layerNum.toString();
+  option.textContent = layerNum.toString();
+  currentLayer = layerNum;
+  select.appendChild(option);
+  select.selectedIndex = select.childElementCount - 1;
+};
+
+createLayerOption(0);
+
+const selectLayer = () => {
+  let flag = true;
+  select.childNodes.forEach((v, i) => {
+    if ((v as HTMLOptionElement).value === currentLayer.toString()) {
+      select.selectedIndex = i;
+      flag = false;
+    }
+  });
+  if (flag) {
+    createLayerOption(currentLayer);
+  }
+};
+
+const undo = document.getElementById('undo') as HTMLButtonElement;
 undo.onclick = () => {
   awPaint.undo();
   currentLayer = awPaint.selectingLayer;
   selectLayer();
 };
-const redo = <HTMLButtonElement>document.getElementById('redo');
+const redo = document.getElementById('redo') as HTMLButtonElement;
 redo.onclick = () => {
   awPaint.redo();
   currentLayer = awPaint.selectingLayer;
   selectLayer();
 };
 
-let currentLayer = 0;
-const remove = <HTMLButtonElement>document.getElementById('remove-layer');
-remove.onclick = () => {
-  removeLayerDiv(currentLayer);
-};
-
-const select = <HTMLSelectElement>document.getElementById('select');
-select.addEventListener('change', () => {
-  const selected = <HTMLOptionElement>document.querySelector('option:checked');
-  const val = selected.value;
-  if (val) {
-    awPaint.selectLayer(parseInt(val));
-    currentLayer = parseInt(val);
-  }
-});
-
-const add = <HTMLButtonElement>document.getElementById('add-layer');
-add.onclick = () => {
-  const num: number = awPaint.addLayer();
-  awPaint.selectLayer(num);
-  createLayerOption(num);
-};
-
+const remove = document.getElementById('remove-layer') as HTMLButtonElement;
 const removeLayerDiv = (layerNum: number) => {
   const num: number | null = awPaint.removeLayer(layerNum);
   const option = document.querySelector('option:checked');
@@ -74,26 +80,24 @@ const removeLayerDiv = (layerNum: number) => {
   }
 };
 
-const selectLayer = () => {
-  let flag = true;
-  select.childNodes.forEach((v, i) => {
-    if ((<HTMLOptionElement>v).value === currentLayer.toString()) {
-      select.selectedIndex = i;
-      flag = false;
-    }
-  });
-  if (flag) {
-    createLayerOption(currentLayer);
+remove.onclick = () => {
+  removeLayerDiv(currentLayer);
+};
+
+select.addEventListener('change', () => {
+  const selected = document.querySelector(
+    'option:checked'
+  ) as HTMLOptionElement;
+  const val = selected.value;
+  if (val) {
+    awPaint.selectLayer(parseInt(val, 10));
+    currentLayer = parseInt(val, 10);
   }
-};
+});
 
-const createLayerOption = (layerNum: number) => {
-  const option = document.createElement('option');
-  option.value = layerNum.toString();
-  option.textContent = layerNum.toString();
-  currentLayer = layerNum;
-  select.appendChild(option);
-  select.selectedIndex = select.childElementCount - 1;
+const add = document.getElementById('add-layer') as HTMLButtonElement;
+add.onclick = () => {
+  const num: number = awPaint.addLayer();
+  awPaint.selectLayer(num);
+  createLayerOption(num);
 };
-
-createLayerOption(0);

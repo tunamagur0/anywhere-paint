@@ -1,77 +1,72 @@
 import ColorCircle from './colorCircle';
-import { HSV, RGB } from './colorUtil';
+import { HSV } from './colorUtil';
 import { PenStyle } from './lineRender';
 import CanvasManager from './canvasManager';
 
-export default class AnyWherePaint {
-  private div_: HTMLDivElement;
-  private width_: number;
-  private height_: number;
-  private colorCircle_: ColorCircle | null = null;
-  private canvasManager_: CanvasManager;
+export default class AnywherePaint {
+  private colorCircle: ColorCircle | null = null;
 
-  //automatically create layer 0
+  private canvasManager: CanvasManager;
+
+  // automatically create layer 0
   constructor(div: HTMLDivElement, width: number, height: number) {
-    this.div_ = div;
-    this.width_ = width;
-    this.height_ = height;
-    this.canvasManager_ = new CanvasManager(div, width, height);
+    this.canvasManager = new CanvasManager(div, width, height);
   }
 
   /**
    *
    * @param {number} width line width(px)
    */
-  public setLineWidth(width: number) {
-    this.canvasManager_.setLineWidth(width);
+  public setLineWidth(width: number): void {
+    this.canvasManager.setLineWidth(width);
   }
 
-  public createColorCircle(div: HTMLDivElement) {
-    this.colorCircle_ = new ColorCircle(div);
-    this.canvasManager_.setColor(this.colorCircle_.getColor(true));
-    window.addEventListener('mouseup', e => {
-      if (this.colorCircle_)
-        this.canvasManager_.setColor(<HSV>this.colorCircle_.getColor(true));
+  public createColorCircle(div: HTMLDivElement): void {
+    this.colorCircle = new ColorCircle(div);
+    this.canvasManager.setColor(this.colorCircle.getColor(true));
+    window.addEventListener('mouseup', () => {
+      if (this.colorCircle)
+        this.canvasManager.setColor(this.colorCircle.getColor(true) as HSV);
     });
   }
 
-  public changeMode(mode: PenStyle | string) {
-    this.canvasManager_.changeMode(mode);
+  public changeMode(mode: PenStyle | string): void {
+    this.canvasManager.changeMode(mode);
   }
 
-  public undo() {
-    this.canvasManager_.undo();
+  public undo(): void {
+    this.canvasManager.undo();
   }
 
-  public redo() {
-    this.canvasManager_.redo();
+  public redo(): void {
+    this.canvasManager.redo();
   }
 
-  public get selectingLayer() {
-    return this.canvasManager_.selectingLayer;
+  public get selectingLayer(): number {
+    return this.canvasManager.selectingLayer;
   }
 
-  public selectLayer(layerNum: number) {
-    this.canvasManager_.selectLayer(layerNum);
+  public selectLayer(layerNum: number): void {
+    this.canvasManager.selectLayer(layerNum);
   }
 
   public addLayer(): number {
-    return this.canvasManager_.addLayer();
+    return this.canvasManager.addLayer();
   }
 
   public removeLayer(layerNum: number): number | null {
-    return this.canvasManager_.removeLayer(layerNum);
+    return this.canvasManager.removeLayer(layerNum);
   }
 
   public renameLayer(layerNum: number, layerName: string) {
-    this.canvasManager_.renameLayer(layerNum, layerName);
+    this.canvasManager.renameLayer(layerNum, layerName);
   }
 
   public getLayerImages(): Map<number, string> {
-    return this.canvasManager_.getLayerImages();
+    return this.canvasManager.getLayerImages();
   }
 
   public getLayerNames(): Map<number, string> {
-    return this.canvasManager_.getLayerNames();
+    return this.canvasManager.getLayerNames();
   }
 }

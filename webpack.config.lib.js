@@ -4,13 +4,17 @@ const contentBase = path.resolve(__dirname, 'public');
 module.exports = {
   mode: 'development',
   entry: {
-    index: './src/index.ts',
-    colorRender: './src/colorRender.ts',
+    lib: './src/anywherePaint.ts',
   },
   output: {
     path: contentBase,
-    filename: '[name].bundle.js',
+    filename: 'anywherePaint.js',
+    library: 'AnywherePaint',
+    libraryTarget: 'umd',
+    libraryExport: 'default',
+    globalObject: 'this',
   },
+
   resolve: {
     extensions: ['.ts', '.js'],
   },
