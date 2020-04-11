@@ -1,5 +1,5 @@
 import ColorCircle from './colorCircle';
-import { HSV } from './colorUtil';
+import { RGB, HSV } from './colorUtil';
 import { PenStyle } from './lineRender';
 import CanvasManager from './canvasManager';
 
@@ -28,6 +28,10 @@ export default class AnywherePaint {
       if (this.colorCircle)
         this.canvasManager.setColor(this.colorCircle.getColor(true) as HSV);
     });
+  }
+
+  public setColor(r: number, g: number, b: number): void {
+    this.canvasManager.setColor(new RGB(r, g, b));
   }
 
   public changeMode(mode: PenStyle | string): void {

@@ -1,6 +1,6 @@
 {
-  "name": "anywhere_paint",
-  "version": "1.0.0",
+  "name": "anywhere-paint",
+  "version": "0.0.1",
   "description": "",
   "main": "lib/anywherePaint.js",
   "types": "lib/anywherePaint.d.ts",
@@ -11,13 +11,13 @@
     "pacakge.json"
   ],
   "scripts": {
-    "build": "webpack",
-    "build:lib": "webpack --config webpack.config.lib.js",
-    "start": "webpack-dev-server --open",
-    "lint": "npx eslint 'src/**/*.{js,ts}' --quiet --fix",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx webpack",
+    "build:lib": "npx webpack --config webpack.config.lib.js",
+    "start": "npx webpack-dev-server --open",
+    "lint": "npx eslint \"src/**/*.{js,ts}\" --quiet --fix",
+    "test": "npm run lint",
     "doc": "npx typedoc --out doc src",
-    "prepublish": "npm run doc && npm run build:lib"
+    "prepare": "npm run test && npm run doc && npm run build:lib"
   },
   "author": "tunamagur0",
   "license": "MIT",
