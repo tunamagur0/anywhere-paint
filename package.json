@@ -16,7 +16,8 @@
     "start": "webpack-dev-server --open",
     "lint": "npx eslint 'src/**/*.{js,ts}' --quiet --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "npm run build:lib"
+    "doc": "npx typedoc --out doc src",
+    "prepublish": "npm run doc && npm run build:lib"
   },
   "author": "tunamagur0",
   "license": "MIT",
