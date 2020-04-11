@@ -1,8 +1,9 @@
 const path = require('path');
-const contentBase = path.resolve(__dirname, 'public');
+
+const contentBase = path.resolve(__dirname, 'lib');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     lib: './src/anywherePaint.ts',
   },
@@ -32,20 +33,17 @@ module.exports = {
       },
       {
         test: /\.ts$/,
-        use: 'ts-loader',
+        loader: 'ts-loader',
         exclude: /node_modules/,
+        options: {
+          compilerOptions: {
+            outDir: 'lib',
+          },
+        },
       },
     ],
   },
-  resolve: {
-    extensions: ['.ts', '.js'],
-  },
-  devtool: 'inline-source-map',
   devServer: {
-    contentBase: './dist',
-    open: true,
-  },
-  devServer: {
-    contentBase: contentBase,
+    contentBase,
   },
 };

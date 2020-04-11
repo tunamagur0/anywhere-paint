@@ -1,3 +1,4 @@
 node_modules/*
 dist/*
+lib/*
 public/bundle.js
