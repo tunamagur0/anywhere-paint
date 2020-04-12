@@ -1,7 +1,16 @@
 {
   "name": "anywhere-paint",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.0.2",
+  "description": "anywhere-paint is a library to create painting apps.",
+  "keywords": [
+    "paint",
+    "drawing"
+  ],
+  "homepage": "https://github.com/tunamagur0/anywhere_paint/#readme",
+  "bugs": {
+    "email": "tsunamaguro3@gmail.com",
+    "url": "https://github.com/tunamagur0/anywhere_paint/issues"
+  },
   "main": "lib/anywherePaint.js",
   "types": "lib/anywherePaint.d.ts",
   "entry": "src/anywherePaint.ts",
@@ -11,6 +20,10 @@
     "pacakge.json",
     "doc"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tunamagur0/anywhere_paint.git"
+  },
   "scripts": {
     "build": "npx webpack",
     "build:lib": "npx webpack --config webpack.config.lib.js",
@@ -20,8 +33,16 @@
     "doc": "npx typedoc --out doc src",
     "prepare": "npm run test && npm run doc && npm run build:lib"
   },
-  "author": "tunamagur0",
-  "license": "MIT",
+  "author": {
+    "name": "tunamagur0",
+    "email": "tsunamaguro3@gmail.com"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/tunamagur0/anywhere_paint/blob/master/LICENSE.txt"
+    }
+  ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
