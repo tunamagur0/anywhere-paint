@@ -1,3 +1,4 @@
+import Worker from './circle.worker';
 import * as colorUtil from './colorUtil';
 
 export default class ColorCircle {
@@ -40,7 +41,7 @@ export default class ColorCircle {
     this.canvas.height = this.height;
     this.div.appendChild(this.canvas);
 
-    this.worker = new Worker('colorRender.bundle.js');
+    this.worker = new Worker(); // new Worker('./colorRender.ts', { type: 'module' });
     this.initSlider();
     const offcan: OffscreenCanvas = this.canvas.transferControlToOffscreen();
     this.worker.postMessage(

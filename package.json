@@ -28,7 +28,7 @@
     "build": "npx webpack",
     "build:lib": "npx webpack --config webpack.config.lib.js",
     "start": "npx webpack-dev-server --open",
-    "lint": "npx eslint \"src/**/*.{js,ts}\" --quiet --fix",
+    "lint": "npx eslint \"src/**/*.ts\" --quiet --fix",
     "test": "npm run lint",
     "doc": "npx typedoc --out doc src",
     "prepare": "npm run test && npm run doc && npm run build:lib"
@@ -54,6 +54,7 @@
     "typescript": "^3.8.3",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.10.3",
+    "worker-loader": "^2.0.0"
   }
 }

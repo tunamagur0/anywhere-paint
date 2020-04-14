@@ -1,5 +1,4 @@
 const path = require('path');
-
 const contentBase = path.resolve(__dirname, 'lib');
 
 module.exports = {
@@ -15,9 +14,8 @@ module.exports = {
     libraryExport: 'default',
     globalObject: 'this',
   },
-
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts'],
   },
 
   module: {
@@ -29,6 +27,15 @@ module.exports = {
         loader: 'eslint-loader',
         options: {
           fix: true,
+        },
+      },
+      {
+        test: /\.worker\.ts$/,
+        loader: 'worker-loader',
+        options: {
+          name: '[name].[hash].js',
+          inline: true,
+          publicPath: '/',
         },
       },
       {

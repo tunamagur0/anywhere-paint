@@ -99,7 +99,8 @@ class Renderer {
 }
 
 let renderer: Renderer | null = null;
-onmessage = (event: MessageEvent): void => {
+declare const self: Worker;
+self.onmessage = (event: MessageEvent): void => {
   switch (event.data.type) {
     case 'init':
       renderer = new Renderer(
@@ -118,3 +119,4 @@ onmessage = (event: MessageEvent): void => {
       break;
   }
 };
+export default {} as typeof Worker & { new (): Worker };

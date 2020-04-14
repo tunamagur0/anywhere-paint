@@ -10,6 +10,8 @@
     "pretty": true,
     "newLine": "lf",
     "outDir": "dist",
-    "lib": ["DOM", "ES6"]
+    "esModuleInterop": true,
+    "lib": ["DOM", "ES6", "WebWorker"],
+    "typeRoots": ["typings", "node_modules/@types"],
   }
 }

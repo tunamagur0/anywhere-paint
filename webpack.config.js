@@ -5,7 +5,6 @@ module.exports = {
   mode: 'development',
   entry: {
     index: './src/index.ts',
-    colorRender: './src/colorRender.ts',
   },
   output: {
     path: contentBase,
@@ -24,6 +23,15 @@ module.exports = {
         loader: 'eslint-loader',
         options: {
           fix: true,
+        },
+      },
+      {
+        test: /\.worker\.ts$/,
+        loader: 'worker-loader',
+        options: {
+          name: '[name].[hash].js',
+          inline: true,
+          publicPath: '/',
         },
       },
       {
