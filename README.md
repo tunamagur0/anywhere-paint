@@ -11,7 +11,7 @@ anywhere-paint is a library to create painting apps.
 Create an AnywherePaint obj:
 
 ```
-const container = document.getElementById('container');
+const container = document.getElementById('container'); //The aspect ratio of the container should be equal to the resolution.
 const width = 600;  //width resolution
 const height = 400; //height resolution
 const awPaint = new AnywherePaint(container, width, height);
@@ -22,7 +22,7 @@ now you can draw lines.
 Create a ColorCircle obj (only browser which supports OffscreenCanvas):
 
 ```
-const container = document.getElementById('cc-container');
+const container = document.getElementById('cc-container');  //The aspect ratio of the container should be 1:1
 awPaint.createColorCircle(container);
 ```
 

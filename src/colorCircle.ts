@@ -24,8 +24,15 @@ export default class ColorCircle {
   private worker: Worker;
 
   constructor(div: HTMLDivElement) {
-    this.div = div;
+    this.div = document.createElement('div');
+    div.appendChild(this.div);
     this.div.style.position = 'relative';
+    this.div.style.top = '50%';
+    this.div.style.left = '50%';
+    this.div.style.transform = 'translate(-50%, -50%)';
+    const min = `${Math.min(div.clientWidth, div.clientHeight)}px`;
+    this.div.style.width = min;
+    this.div.style.height = min;
 
     this.hueSlider = document.createElement('div');
     this.div.appendChild(this.hueSlider);
@@ -33,10 +40,7 @@ export default class ColorCircle {
     this.div.appendChild(this.svSlider);
 
     this.canvas = document.createElement('canvas');
-    this.canvas.style.width = `${Math.min(
-      this.div.clientWidth,
-      this.div.clientHeight
-    )}px`;
+    this.canvas.style.width = min;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.div.appendChild(this.canvas);
@@ -57,6 +61,16 @@ export default class ColorCircle {
     this.worker.postMessage({
       type: 'update',
       hue: 0,
+    });
+
+    window.addEventListener('resize', () => {
+      const minWH = `${Math.min(div.clientWidth, div.clientHeight)}px`;
+      this.div.style.width = minWH;
+      this.div.style.height = minWH;
+      this.updateHueSlider(this.hsv.h);
+      this.updateSVSlider(this.hsv.s, this.hsv.v);
+      this.canvas.style.width = minWH;
+      this.canvas.style.height = minWH;
     });
   }
 
@@ -94,7 +108,9 @@ export default class ColorCircle {
     const v = Math.round(v_);
     const centerX: number = this.div.clientWidth / 2;
     const centerY: number = this.div.clientHeight / 2;
-    const svSize = this.svSlider.clientWidth;
+    const svSize = (3 * this.canvas2div(this.size)) / 100;
+    this.svSlider.style.width = `${svSize - 1}px`;
+    this.svSlider.style.height = `${svSize - 1}px`;
     this.svSlider.style.left = `${
       centerX + (s - 50) * 0.01 * this.canvas2div(this.size) - svSize / 2
     }px`;

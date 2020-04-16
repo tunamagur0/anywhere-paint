@@ -27,7 +27,12 @@ export default class CanvasManager {
   private pSelectingLayer = 0;
 
   constructor(div: HTMLDivElement, width: number, height: number) {
-    this.div = div;
+    this.div = document.createElement('div');
+    this.div.style.width = '100%';
+    this.div.style.height = '100%';
+    this.div.style.position = 'relative';
+    this.div.style.overflow = 'hidden';
+    div.appendChild(this.div);
     this.width = width;
     this.height = height;
     this.historyManager = new HistoryManager();

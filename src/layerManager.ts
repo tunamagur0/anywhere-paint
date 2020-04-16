@@ -40,6 +40,9 @@ export default class LayerManager {
     canvas.width = this.width;
     canvas.height = this.height;
     canvas.style.position = 'absolute';
+    canvas.style.top = '50%';
+    canvas.style.left = '50%';
+    canvas.style.transform = 'translate(-50%, -50%)';
     this.div.appendChild(canvas);
     this.layers.set(this.cnt, canvas);
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
