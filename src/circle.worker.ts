@@ -33,30 +33,27 @@ class Renderer {
     const rIn: number = r - this.rDiff;
     const centerX: number = this.width / 2;
     const centerY: number = this.height / 2;
-    const angle2x = (angle: number): number => {
-      return r * Math.cos(Renderer.angle2rad(angle - 120));
+    const angle2x = (radius: number, angle: number): number => {
+      return radius * Math.cos(Renderer.angle2rad(angle - 120));
     };
-    const angle2y = (angle: number): number => {
-      return r * Math.sin(Renderer.angle2rad(angle - 120));
+    const angle2y = (radius: number, angle: number): number => {
+      return radius * Math.sin(Renderer.angle2rad(angle - 120));
     };
 
     // draw Hue circle
     for (let i = 0; i <= 360; i += 0.1) {
       this.ctx.fillStyle = `hsl(${i}, 100%, 50%)`;
-      this.ctx.moveTo(centerX, centerY);
+      this.ctx.moveTo(
+        centerX + angle2x(rIn, i - 1),
+        centerY + angle2y(rIn, i - 1)
+      );
       this.ctx.beginPath();
-      this.ctx.lineTo(centerX + angle2x(i - 1), centerY + angle2y(i - 1));
-      this.ctx.lineTo(centerX + angle2x(i), centerY + angle2y(i));
-      this.ctx.lineTo(centerX, centerY);
+      this.ctx.lineTo(centerX + angle2x(r, i - 1), centerY + angle2y(r, i - 1));
+      this.ctx.lineTo(centerX + angle2x(r, i), centerY + angle2y(r, i));
+      this.ctx.lineTo(centerX + angle2x(rIn, i), centerY + angle2y(rIn, i));
       this.ctx.closePath();
       this.ctx.fill();
     }
-
-    // draw inner circle
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, rIn, 0, Math.PI * 2, true);
-    this.ctx.fillStyle = 'rgb(255, 255, 255)';
-    this.ctx.fill();
 
     // draw border
     this.ctx.strokeStyle = 'rgb(0, 0, 0)';

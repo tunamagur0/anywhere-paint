@@ -51,7 +51,7 @@ export default class CanvasManager {
     this.lineRender.setWidth(width);
   }
 
-  public changeMode(mode: PenStyle | string): void {
+  public changeMode(mode: PenStyle): void {
     this.lineRender.changeMode(mode);
   }
 
@@ -78,7 +78,7 @@ export default class CanvasManager {
       const y: number = e.clientY - rect.top;
       this.lineRender.start({ x, y }, this.color);
     };
-    window.onmouseup = (e: MouseEvent): void => {
+    window.onmouseup = (): void => {
       const hist = this.lineRender.end();
       if (hist) this.historyManager.do(hist);
     };
@@ -91,7 +91,7 @@ export default class CanvasManager {
   }
 
   public addLayer(): number {
-    const { canvas, ctx, layerNum, history } = this.layerManager.addLayer();
+    const { canvas, layerNum, history } = this.layerManager.addLayer();
     this.historyManager.do(history);
     this.setEvent(canvas);
     return layerNum;

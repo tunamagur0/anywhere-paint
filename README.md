@@ -47,7 +47,7 @@ Unique number is assigned to each layer.
 awPaint.addLayer();
 ```
 
-Add a new on top and select that.
+Add a new on top.
 Returns unique number which is assigned to new layer.
 
 ```

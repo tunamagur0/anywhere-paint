@@ -34,7 +34,7 @@ export default class AnywherePaint {
     this.canvasManager.setColor(new RGB(r, g, b));
   }
 
-  public changeMode(mode: PenStyle | string): void {
+  public changeMode(mode: PenStyle): void {
     this.canvasManager.changeMode(mode);
   }
 
@@ -62,7 +62,7 @@ export default class AnywherePaint {
     return this.canvasManager.removeLayer(layerNum);
   }
 
-  public renameLayer(layerNum: number, layerName: string) {
+  public renameLayer(layerNum: number, layerName: string): void {
     this.canvasManager.renameLayer(layerNum, layerName);
   }
 

@@ -158,7 +158,8 @@ export default class ColorCircle {
         hueFlag = true;
       }
     });
-    this.div.addEventListener('mousemove', (e) => {
+
+    const updateHue = (e: MouseEvent): void => {
       if (hueFlag) {
         const centerX: number = this.div.clientWidth / 2;
         const centerY: number = this.div.clientHeight / 2;
@@ -172,7 +173,11 @@ export default class ColorCircle {
         this.updateHueSlider(
           (ColorCircle.rad2angle(angleC * sign) + 120 + 360) % 360
         );
-      } else if (svFlag) {
+      }
+    };
+
+    const updateSV = (e: MouseEvent): void => {
+      if (svFlag) {
         const centerX: number = this.div.clientWidth / 2;
         const centerY: number = this.div.clientHeight / 2;
         const rect: DOMRect = this.div.getBoundingClientRect();
@@ -189,8 +194,16 @@ export default class ColorCircle {
           100 - Math.min(100, Math.max(((y - top) / divSize) * 100, 0));
         this.updateSVSlider(s, v);
       }
+    };
+
+    this.div.addEventListener('mousemove', (e: MouseEvent) => {
+      updateHue(e);
+      updateSV(e);
     });
-    window.addEventListener('mouseup', () => {
+
+    window.addEventListener('mouseup', (e: MouseEvent) => {
+      updateHue(e);
+      updateSV(e);
       hueFlag = false;
       svFlag = false;
     });

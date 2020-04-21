@@ -1,31 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-</head>
-
-<body style="width: 100vw; height: 100vh;">
-  <!-- <div id="circle" style="width: 300px; height: 300px;"></div> -->
-  <div id="circle" style="width: 30%; height: 30%;"></div>
-  <div id="canvas" style="border: solid 1px black; width: 600px; height: 400px;"></div>
-  <input type="range" value="1" min="1" max="10" step="1"
-    oninput="document.getElementById('output1').value=this.value" />
-  <output id="output1">1</output>
-  <button id="button">width</button>
-  <input id="is-eraser" type="checkbox" />
-  <button id="undo">undo</button>
-  <button id="redo">redo</button>
-  <div id="layers">
-    <div id="buttons">
-      <button id="add-layer">add-layer</button>
-      <button id="remove-layer">remove-layer</button>
+  <body style="width: 100vw; height: 100vh;">
+    <!-- <div id="circle" style="width: 300px; height: 300px;"></div> -->
+    <div id="circle" style="width: 30%; height: 30%;"></div>
+    <div
+      id="canvas"
+      style="border: solid 1px black; width: 600px; height: 400px;"
+    ></div>
+    <input
+      type="range"
+      value="1"
+      min="1"
+      max="10"
+      step="1"
+      oninput="document.getElementById('output1').value=this.value"
+    />
+    <output id="output1">1</output>
+    <button id="button">width</button>
+    <input id="is-eraser" type="checkbox" />
+    <button id="undo">undo</button>
+    <button id="redo">redo</button>
+    <div id="layers">
+      <div id="buttons">
+        <button id="add-layer">add-layer</button>
+        <button id="remove-layer">remove-layer</button>
+      </div>
+      <select id="select"></select>
     </div>
-    <select id="select"></select>
-  </div>
-  <script src="index.bundle.js"></script>
-</body>
-
+    <script src="index.bundle.js"></script>
+  </body>
 </html>

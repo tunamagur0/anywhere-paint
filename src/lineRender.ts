@@ -1,10 +1,7 @@
 import * as colorUtil from './colorUtil';
 import { LineHistory, HistoryTypes } from './historyTypes';
 
-export enum PenStyle {
-  Pencil,
-  Eraser,
-}
+export type PenStyle = 'Pencil' | 'Eraser';
 
 export class LineRender {
   private canvas: HTMLCanvasElement;
@@ -13,7 +10,7 @@ export class LineRender {
 
   private isDrawing = false;
 
-  private mode: PenStyle = PenStyle.Pencil;
+  private mode: PenStyle = 'Pencil';
 
   private pre: { x: number; y: number } = { x: 0, y: 0 };
 
@@ -55,11 +52,9 @@ export class LineRender {
     this.layerNum = layerNum;
   }
 
-  public changeMode(mode: PenStyle | string): void {
-    const tmp: PenStyle | undefined = (PenStyle as any)[mode];
-    if (tmp !== undefined) {
-      this.mode = tmp;
-    }
+  public changeMode(mode: PenStyle): void {
+    const tmp: PenStyle = mode;
+    this.mode = tmp;
   }
 
   public setWidth(width: number): void {
@@ -96,10 +91,10 @@ export class LineRender {
     if (!this.isDrawing) return;
 
     switch (this.mode) {
-      case PenStyle.Pencil:
+      case 'Pencil':
         this.ctx.globalCompositeOperation = 'source-over';
         break;
-      case PenStyle.Eraser:
+      case 'Eraser':
         this.ctx.globalCompositeOperation = 'destination-out';
         break;
       default:
@@ -141,10 +136,10 @@ export class LineRender {
 
   private drawLineByHistory(hist: LineHistory): void {
     switch (hist.info.mode) {
-      case PenStyle.Pencil:
+      case 'Pencil':
         this.ctx.globalCompositeOperation = 'source-over';
         break;
-      case PenStyle.Eraser:
+      case 'Eraser':
         this.ctx.globalCompositeOperation = 'destination-out';
         break;
       default:
