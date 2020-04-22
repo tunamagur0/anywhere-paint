@@ -44,10 +44,11 @@ You can only draw on selected layer.
 Unique number is assigned to each layer.
 
 ```
-awPaint.addLayer();
+awPaint.addLayer(layerNum?);
 ```
 
-Add a new on top.
+If no arguments are specified, a new layer is added at the top.
+Otherwise, a new layer is added on top of the layerNum.
 Returns unique number which is assigned to new layer.
 
 ```
@@ -81,6 +82,12 @@ awPaint.getLayerImages();
 
 Returns Map<layerNum, DataURI>.
 
+```
+awPaint.getSortOrder();
+```
+
+Returns an array of layerNum sorted by layer overlap order.
+
 ### Line
 
 ```
@@ -94,6 +101,14 @@ awPaint.setLineWidth(px);
 ```
 
 Set line width(px).
+
+### Image
+
+```
+awPaint.getIntegratedImage();
+```
+
+Returns DataURI with a layer-integrated image. (png)
 
 ### Mode
 

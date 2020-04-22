@@ -33,9 +33,19 @@ const createLayerOption = (layerNum: number) => {
   const option = document.createElement('option');
   option.value = layerNum.toString();
   option.textContent = layerNum.toString();
+  const sibling = document.querySelector(`option[value="${currentLayer}"]`);
   currentLayer = layerNum;
-  select.appendChild(option);
-  select.selectedIndex = select.childElementCount - 1;
+  if (sibling) {
+    select.insertBefore(option, sibling);
+    for (let i = 0; i < select.children.length; i += 1) {
+      if (select.children[i].textContent === option.textContent) {
+        select.selectedIndex = i;
+      }
+    }
+  } else {
+    select.appendChild(option);
+    select.selectedIndex = select.childElementCount - 1;
+  }
 };
 
 createLayerOption(0);
@@ -97,7 +107,7 @@ select.addEventListener('change', () => {
 
 const add = document.getElementById('add-layer') as HTMLButtonElement;
 add.onclick = () => {
-  const num: number = awPaint.addLayer();
+  const num: number = awPaint.addLayer(currentLayer);
   awPaint.selectLayer(num);
   createLayerOption(num);
 };

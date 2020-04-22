@@ -11,6 +11,8 @@ export default class LayerManager {
     CanvasRenderingContext2D
   >();
 
+  private sortOrder: number[] = [];
+
   private layerNum2layerName: Map<number, string> = new Map<number, string>();
 
   private div: HTMLDivElement;
@@ -27,7 +29,9 @@ export default class LayerManager {
     this.height = height;
   }
 
-  public addLayer(): {
+  public addLayer(
+    layerNum?: number
+  ): {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     layerNum: number;
@@ -36,17 +40,19 @@ export default class LayerManager {
     this.cnt += 1;
     const layerName = `layer${this.cnt}`;
     this.layerNum2layerName.set(this.cnt, layerName);
-    const canvas = document.createElement('canvas');
-    canvas.width = this.width;
-    canvas.height = this.height;
-    canvas.style.position = 'absolute';
-    canvas.style.top = '50%';
-    canvas.style.left = '50%';
-    canvas.style.transform = 'translate(-50%, -50%)';
-    this.div.appendChild(canvas);
+    const canvas = this.createCanvas(this.cnt);
     this.layers.set(this.cnt, canvas);
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     this.ctxs.set(this.cnt, ctx);
+
+    const index = this.sortOrder.findIndex((v) => v === layerNum);
+    if (layerNum !== undefined && index > 0) {
+      this.sortOrder.splice(index, 0, this.cnt);
+    } else {
+      this.sortOrder.unshift(this.cnt);
+    }
+
+    this.sortCanvas();
     return {
       canvas,
       ctx,
@@ -56,6 +62,7 @@ export default class LayerManager {
         info: {
           command: 'add',
           layerNum: this.cnt,
+          order: [...this.sortOrder],
         },
       },
     };
@@ -86,6 +93,12 @@ export default class LayerManager {
     for (const k of this.layers.keys()) {
       ret = Math.max(k, ret);
     }
+    const order = [...this.sortOrder];
+    this.sortOrder.splice(
+      this.sortOrder.findIndex((v) => v === layerNum),
+      1
+    );
+    this.sortCanvas();
     return {
       selectedLayerNum: ret,
       history: {
@@ -94,6 +107,7 @@ export default class LayerManager {
           command: 'remove',
           layerNum,
           snapshot,
+          order,
         },
       },
     };
@@ -129,17 +143,15 @@ export default class LayerManager {
       case 'remove': {
         const layerName = `layer${hist.info.layerNum}`;
         this.layerNum2layerName.set(hist.info.layerNum, layerName);
-        const canvas = document.createElement('canvas');
-        canvas.width = this.width;
-        canvas.height = this.height;
-        canvas.style.position = 'absolute';
-        this.div.appendChild(canvas);
+        const canvas = this.createCanvas(hist.info.layerNum);
         this.layers.set(hist.info.layerNum, canvas);
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         this.ctxs.set(hist.info.layerNum, ctx);
         if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
 
         ret = hist.info.layerNum;
+        if (hist.info.order) this.sortOrder = [...hist.info.order];
+        this.sortCanvas();
         break;
       }
       case 'rename':
@@ -148,7 +160,6 @@ export default class LayerManager {
         break;
       case 'clear': {
         const ctx = this.ctxs.get(hist.info.layerNum);
-        console.log(hist.info.snapshot);
         if (ctx && hist.info.snapshot)
           ctx.putImageData(hist.info.snapshot, 0, 0);
         break;
@@ -165,17 +176,16 @@ export default class LayerManager {
       case 'add': {
         const layerName = `layer${hist.info.layerNum}`;
         this.layerNum2layerName.set(hist.info.layerNum, layerName);
-        const canvas = document.createElement('canvas');
-        canvas.width = this.width;
-        canvas.height = this.height;
-        canvas.style.position = 'absolute';
-        this.div.appendChild(canvas);
+        const canvas = this.createCanvas(hist.info.layerNum);
         this.layers.set(hist.info.layerNum, canvas);
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         this.ctxs.set(hist.info.layerNum, ctx);
         if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
 
         ret = hist.info.layerNum;
+        if (hist.info.order) this.sortOrder = [...hist.info.order];
+        this.sortCanvas();
+
         break;
       }
       case 'remove': {
@@ -197,6 +207,30 @@ export default class LayerManager {
     return ret;
   }
 
+  private createCanvas(layerNum: number): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width;
+    canvas.height = this.height;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '50%';
+    canvas.style.left = '50%';
+    canvas.style.transform = 'translate(-50%, -50%)';
+    canvas.id = `anywhere-paint-layer${layerNum}`;
+    this.div.appendChild(canvas);
+
+    return canvas;
+  }
+
+  private sortCanvas(): void {
+    for (const o of [...this.sortOrder].reverse()) {
+      const elem = document.getElementById(
+        `anywhere-paint-layer${o}`
+      ) as HTMLCanvasElement;
+      elem.remove();
+      this.div.appendChild(elem);
+    }
+  }
+
   public getLayers(): {
     canvas: Map<number, HTMLCanvasElement>;
     ctx: Map<number, CanvasRenderingContext2D>;
@@ -215,6 +249,10 @@ export default class LayerManager {
 
   public getLayerNames(): Map<number, string> {
     return new Map<number, string>(this.layerNum2layerName);
+  }
+
+  public getSortOrder(): number[] {
+    return [...this.sortOrder];
   }
 
   // return base64Image

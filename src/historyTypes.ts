@@ -25,6 +25,7 @@ export interface LayerHistory {
     layerName?: [string, string];
     layerNum: number;
     snapshot?: ImageData;
+    order?: number[];
   };
 }
 

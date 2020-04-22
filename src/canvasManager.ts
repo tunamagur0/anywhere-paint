@@ -90,8 +90,10 @@ export default class CanvasManager {
     };
   }
 
-  public addLayer(): number {
-    const { canvas, layerNum, history } = this.layerManager.addLayer();
+  public addLayer(layerNumber?: number): number {
+    const { canvas, layerNum, history } = this.layerManager.addLayer(
+      layerNumber
+    );
     this.historyManager.do(history);
     this.setEvent(canvas);
     return layerNum;
@@ -194,6 +196,10 @@ export default class CanvasManager {
 
   public getLayerImages(): Map<number, string> {
     return this.layerManager.getLayerImages();
+  }
+
+  public getSortOrder(): number[] {
+    return this.layerManager.getSortOrder();
   }
 
   public getLayerNames(): Map<number, string> {

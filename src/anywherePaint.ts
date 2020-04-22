@@ -54,8 +54,8 @@ export default class AnywherePaint {
     this.canvasManager.selectLayer(layerNum);
   }
 
-  public addLayer(): number {
-    return this.canvasManager.addLayer();
+  public addLayer(layerNum?: number): number {
+    return this.canvasManager.addLayer(layerNum);
   }
 
   public removeLayer(layerNum: number): number | null {
@@ -76,6 +76,10 @@ export default class AnywherePaint {
 
   public getIntegratedImage(): string {
     return this.canvasManager.getIntegratedImage();
+  }
+
+  public getSortOrder(): number[] {
+    return this.canvasManager.getSortOrder();
   }
 
   public clearLayer(layerNum: number): void {
