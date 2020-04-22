@@ -101,3 +101,11 @@ add.onclick = () => {
   awPaint.selectLayer(num);
   createLayerOption(num);
 };
+
+const download = document.getElementById('download') as HTMLButtonElement;
+download.onclick = () => {
+  const a = document.createElement('a');
+  a.download = 'image.png';
+  a.href = awPaint.getIntegratedImage();
+  a.click();
+};

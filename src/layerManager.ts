@@ -205,4 +205,18 @@ export default class LayerManager {
   public getLayerNames(): Map<number, string> {
     return new Map<number, string>(this.layerNum2layerName);
   }
+
+  // return base64Image
+  public getImage(): string {
+    const canvas: HTMLCanvasElement = document.createElement('canvas');
+    canvas.width = this.width;
+    canvas.height = this.height;
+    const ctx: CanvasRenderingContext2D = canvas.getContext(
+      '2d'
+    ) as CanvasRenderingContext2D;
+    for (const [, v] of this.layers.entries()) {
+      ctx.drawImage(v, 0, 0);
+    }
+    return canvas.toDataURL();
+  }
 }

@@ -199,4 +199,8 @@ export default class CanvasManager {
   public getLayerNames(): Map<number, string> {
     return this.layerManager.getLayerNames();
   }
+
+  public getIntegratedImage(): string {
+    return this.layerManager.getImage();
+  }
 }

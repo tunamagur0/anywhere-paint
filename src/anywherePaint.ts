@@ -73,4 +73,8 @@ export default class AnywherePaint {
   public getLayerNames(): Map<number, string> {
     return this.canvasManager.getLayerNames();
   }
+
+  public getIntegratedImage(): string {
+    return this.canvasManager.getIntegratedImage();
+  }
 }
