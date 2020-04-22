@@ -109,3 +109,8 @@ download.onclick = () => {
   a.href = awPaint.getIntegratedImage();
   a.click();
 };
+
+const clear = document.getElementById('clear') as HTMLButtonElement;
+clear.onclick = () => {
+  awPaint.clearLayer(currentLayer);
+};

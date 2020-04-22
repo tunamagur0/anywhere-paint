@@ -146,6 +146,13 @@ export default class LayerManager {
         if (hist.info.layerName)
           this.renameLayer(hist.info.layerNum, hist.info.layerName[1]);
         break;
+      case 'clear': {
+        const ctx = this.ctxs.get(hist.info.layerNum);
+        console.log(hist.info.snapshot);
+        if (ctx && hist.info.snapshot)
+          ctx.putImageData(hist.info.snapshot, 0, 0);
+        break;
+      }
       default:
         break;
     }
@@ -180,6 +187,10 @@ export default class LayerManager {
         if (hist.info.layerName)
           this.renameLayer(hist.info.layerNum, hist.info.layerName[1]);
         break;
+      case 'clear': {
+        this.clearLayer(hist.info.layerNum);
+        break;
+      }
       default:
         break;
     }
@@ -218,5 +229,20 @@ export default class LayerManager {
       ctx.drawImage(v, 0, 0);
     }
     return canvas.toDataURL();
+  }
+
+  public clearLayer(layerNum: number): LayerHistory | null {
+    const ctx = this.ctxs.get(layerNum);
+    if (!ctx) return null;
+    const image = ctx.getImageData(0, 0, this.width, this.height);
+    ctx.clearRect(0, 0, this.width, this.height);
+    return {
+      target: HistoryTypes.LAYER_HISTORY,
+      info: {
+        command: 'clear',
+        layerNum,
+        snapshot: image,
+      },
+    };
   }
 }

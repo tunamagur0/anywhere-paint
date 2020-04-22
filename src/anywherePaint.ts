@@ -77,4 +77,8 @@ export default class AnywherePaint {
   public getIntegratedImage(): string {
     return this.canvasManager.getIntegratedImage();
   }
+
+  public clearLayer(layerNum: number): void {
+    this.canvasManager.clearLayer(layerNum);
+  }
 }

@@ -203,4 +203,11 @@ export default class CanvasManager {
   public getIntegratedImage(): string {
     return this.layerManager.getImage();
   }
+
+  public clearLayer(layerNum: number): void {
+    const hist: LayerHistory | null = this.layerManager.clearLayer(layerNum);
+    if (hist) {
+      this.historyManager.do(hist);
+    }
+  }
 }
