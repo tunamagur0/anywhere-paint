@@ -1,10 +1,9 @@
-import Worker from './circle.worker';
 import * as colorUtil from './colorUtil';
+import CircleGL from './circleGL';
 
 export default class ColorCircle {
   private div: HTMLDivElement;
 
-  // private ctx: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
 
   private hueSlider: HTMLDivElement;
@@ -21,7 +20,7 @@ export default class ColorCircle {
 
   private hsv: colorUtil.HSV = new colorUtil.HSV(0, 0, 0);
 
-  private worker: Worker;
+  private circleGL: CircleGL;
 
   constructor(div: HTMLDivElement) {
     this.div = document.createElement('div');
@@ -45,24 +44,13 @@ export default class ColorCircle {
     this.canvas.height = this.height;
     this.div.appendChild(this.canvas);
 
-    this.worker = new Worker(); // new Worker('./colorRender.ts', { type: 'module' });
-    this.initSlider();
-    const offcan: OffscreenCanvas = this.canvas.transferControlToOffscreen();
-    this.worker.postMessage(
-      {
-        type: 'init',
-        canvas: offcan,
-        width: this.width,
-        height: this.height,
-        size: this.size,
-      },
-      [offcan]
+    this.circleGL = new CircleGL(
+      this.canvas,
+      this.width,
+      this.height,
+      this.size
     );
-    this.worker.postMessage({
-      type: 'update',
-      hue: 0,
-    });
-
+    this.initSlider();
     window.addEventListener('resize', () => {
       const minWH = `${Math.min(div.clientWidth, div.clientHeight)}px`;
       this.div.style.width = minWH;
@@ -211,7 +199,7 @@ export default class ColorCircle {
 
   private updateColor(angle_: number): void {
     const angle = Math.round(angle_);
-    this.worker.postMessage({ type: 'update', hue: angle });
+    this.circleGL.render(angle);
 
     this.hsv.h = angle;
   }

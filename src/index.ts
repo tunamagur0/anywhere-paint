@@ -142,7 +142,6 @@ const shuffle = document.getElementById('shuffle') as HTMLButtonElement;
 shuffle.onclick = () => {
   const sortOrder = awPaint.getSortOrder();
   sortOrder.sort(() => Math.random() - 0.5);
-  console.log(sortOrder);
   awPaint.setSortOrder(sortOrder);
   sortOption();
 };

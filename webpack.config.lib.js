@@ -30,15 +30,6 @@ module.exports = {
         },
       },
       {
-        test: /\.worker\.ts$/,
-        loader: 'worker-loader',
-        options: {
-          name: '[name].[hash].js',
-          inline: true,
-          publicPath: '/',
-        },
-      },
-      {
         test: /\.ts$/,
         loader: 'ts-loader',
         exclude: /node_modules/,

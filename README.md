@@ -20,7 +20,7 @@ const awPaint = new AnywherePaint(container, width, height);
 
 now you can draw lines.
 
-Create a ColorCircle obj (only browser which supports OffscreenCanvas):
+Create a ColorCircle obj:
 
 ```
 const container = document.getElementById('cc-container');  //The aspect ratio of the container should be 1:1
