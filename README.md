@@ -1,6 +1,7 @@
 # anywhere-paint
 
-anywhere-paint is a library to create painting apps.
+`anywhere-paint` is a library to create painting apps.
+Sample is [here](https://tunamagur0.github.io/anywhere-paint-sample)!
 
 ## Installation
 
@@ -87,6 +88,18 @@ awPaint.getSortOrder();
 ```
 
 Returns an array of layerNum sorted by layer overlap order.
+
+```
+awPaint.setSortOrder(sortOrder);
+```
+
+`sortOrder` is an array which includes layerNums.
+
+Example ) [0, 2, 1]. At this time, 0 is the top and 1 is the buttom.
+
+If argument is valid, layers are sorted by input.
+
+Returns argument is valid or not.
 
 ### Line
 

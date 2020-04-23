@@ -21,11 +21,11 @@ export interface LineHistory {
 export interface LayerHistory {
   target: HistoryTypes.LAYER_HISTORY;
   info: {
-    command: 'add' | 'remove' | 'rename' | 'clear';
+    command: 'add' | 'remove' | 'rename' | 'clear' | 'sort';
     layerName?: [string, string];
     layerNum: number;
     snapshot?: ImageData;
-    order?: number[];
+    order?: number[][];
   };
 }
 

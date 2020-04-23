@@ -6,10 +6,10 @@
     "paint",
     "drawing"
   ],
-  "homepage": "https://github.com/tunamagur0/anywhere_paint/#readme",
+  "homepage": "https://github.com/tunamagur0/anywhere-paint/#readme",
   "bugs": {
     "email": "tsunamaguro3@gmail.com",
-    "url": "https://github.com/tunamagur0/anywhere_paint/issues"
+    "url": "https://github.com/tunamagur0/anywhere-paint/issues"
   },
   "main": "lib/anywherePaint.js",
   "types": "lib/anywherePaint.d.ts",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tunamagur0/anywhere_paint.git"
+    "url": "https://github.com/tunamagur0/anywhere-paint.git"
   },
   "scripts": {
     "build": "npx webpack",

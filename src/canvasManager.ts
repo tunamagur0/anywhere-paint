@@ -216,4 +216,15 @@ export default class CanvasManager {
       this.historyManager.do(hist);
     }
   }
+
+  public setSortOrder(sortOrder: number[]): boolean {
+    const { isValid, hist } = this.layerManager.setSortOrder(
+      sortOrder,
+      this.selectingLayer
+    );
+    if (isValid) {
+      this.historyManager.do(hist);
+    }
+    return isValid;
+  }
 }

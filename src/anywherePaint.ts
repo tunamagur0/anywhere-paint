@@ -82,6 +82,10 @@ export default class AnywherePaint {
     return this.canvasManager.getSortOrder();
   }
 
+  public setSortOrder(sortOrder: number[]): boolean {
+    return this.canvasManager.setSortOrder(sortOrder);
+  }
+
   public clearLayer(layerNum: number): void {
     this.canvasManager.clearLayer(layerNum);
   }

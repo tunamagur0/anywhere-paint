@@ -48,6 +48,17 @@ const createLayerOption = (layerNum: number) => {
   }
 };
 
+const sortOption = () => {
+  const sortOrder = awPaint.getSortOrder();
+  for (const o of sortOrder) {
+    const elem = document.querySelector(
+      `option[value="${o}"]`
+    ) as HTMLOptionElement;
+    elem.remove();
+    select.appendChild(elem);
+  }
+};
+
 createLayerOption(0);
 
 const selectLayer = () => {
@@ -68,12 +79,14 @@ undo.onclick = () => {
   awPaint.undo();
   currentLayer = awPaint.selectingLayer;
   selectLayer();
+  sortOption();
 };
 const redo = document.getElementById('redo') as HTMLButtonElement;
 redo.onclick = () => {
   awPaint.redo();
   currentLayer = awPaint.selectingLayer;
   selectLayer();
+  sortOption();
 };
 
 const remove = document.getElementById('remove-layer') as HTMLButtonElement;
@@ -123,4 +136,13 @@ download.onclick = () => {
 const clear = document.getElementById('clear') as HTMLButtonElement;
 clear.onclick = () => {
   awPaint.clearLayer(currentLayer);
+};
+
+const shuffle = document.getElementById('shuffle') as HTMLButtonElement;
+shuffle.onclick = () => {
+  const sortOrder = awPaint.getSortOrder();
+  sortOrder.sort(() => Math.random() - 0.5);
+  console.log(sortOrder);
+  awPaint.setSortOrder(sortOrder);
+  sortOption();
 };

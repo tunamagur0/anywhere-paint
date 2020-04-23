@@ -46,6 +46,7 @@ export default class LayerManager {
     this.ctxs.set(this.cnt, ctx);
 
     const index = this.sortOrder.findIndex((v) => v === layerNum);
+    const preOrder = [...this.sortOrder];
     if (layerNum !== undefined && index > 0) {
       this.sortOrder.splice(index, 0, this.cnt);
     } else {
@@ -62,7 +63,7 @@ export default class LayerManager {
         info: {
           command: 'add',
           layerNum: this.cnt,
-          order: [...this.sortOrder],
+          order: [preOrder, [...this.sortOrder]],
         },
       },
     };
@@ -107,7 +108,7 @@ export default class LayerManager {
           command: 'remove',
           layerNum,
           snapshot,
-          order,
+          order: [order, [...this.sortOrder]],
         },
       },
     };
@@ -150,7 +151,7 @@ export default class LayerManager {
         if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
 
         ret = hist.info.layerNum;
-        if (hist.info.order) this.sortOrder = [...hist.info.order];
+        if (hist.info.order) this.sortOrder = [...hist.info.order[0]];
         this.sortCanvas();
         break;
       }
@@ -162,6 +163,13 @@ export default class LayerManager {
         const ctx = this.ctxs.get(hist.info.layerNum);
         if (ctx && hist.info.snapshot)
           ctx.putImageData(hist.info.snapshot, 0, 0);
+        break;
+      }
+      case 'sort': {
+        if (hist.info.order) {
+          this.sortOrder = [...hist.info.order[0]];
+          this.sortCanvas();
+        }
         break;
       }
       default:
@@ -183,7 +191,7 @@ export default class LayerManager {
         if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
 
         ret = hist.info.layerNum;
-        if (hist.info.order) this.sortOrder = [...hist.info.order];
+        if (hist.info.order) this.sortOrder = [...hist.info.order[1]];
         this.sortCanvas();
 
         break;
@@ -199,6 +207,13 @@ export default class LayerManager {
         break;
       case 'clear': {
         this.clearLayer(hist.info.layerNum);
+        break;
+      }
+      case 'sort': {
+        if (hist.info.order) {
+          this.sortOrder = [...hist.info.order[1]];
+          this.sortCanvas();
+        }
         break;
       }
       default:
@@ -282,5 +297,28 @@ export default class LayerManager {
         snapshot: image,
       },
     };
+  }
+
+  public setSortOrder(
+    sortOrder: number[],
+    selecting: number
+  ): { isValid: boolean; hist: LayerHistory } {
+    const isValid =
+      sortOrder.filter((v) => !this.layers.has(v)).length === 0 &&
+      this.layers.size === new Set(sortOrder).size &&
+      this.layers.size === sortOrder.length;
+    const hist: LayerHistory = {
+      target: HistoryTypes.LAYER_HISTORY,
+      info: {
+        command: 'sort',
+        layerNum: selecting,
+        order: [[...this.sortOrder], [...sortOrder]],
+      },
+    };
+    if (isValid) {
+      this.sortOrder = [...sortOrder];
+      this.sortCanvas();
+    }
+    return { isValid, hist };
   }
 }
