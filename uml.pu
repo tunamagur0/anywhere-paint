@@ -1,0 +1,246 @@
+@startuml
+title anywhere-paint
+
+hide <<Type>> circle
+hide <<Type>> methods
+
+class AnywherePaint {
+    {field} - canvasManager: CanvasManager
+    {field} - colorCircle: ColorCircle
+    {field} + selectingLayer(): number
+
+    {method} + AnywherePaint(div: HTMLDivElement, width: number, height: number): AnywherePaint
+    {method} + addLayer(layerNum?: undefined | number): number
+    {method} + changeMode(mode: PenStyle): void
+    {method} + clearLayer(layerNum: number): void
+    {method} + createColorCircle(div: HTMLDivElement): void
+    {method} + getIntegratedImage(): string
+    {method} + getLayerImages(): Map<number, string>
+    {method} + getLayerNames(): Map<number, string>
+    {method} + getSortOrder(): number[]
+    {method} + setSortOrder(sortOrder: number[]): boolean
+    {method} + removeLayer(layerNum: number): number | null
+    {method} + selectLayer(layerNum: number): void
+    {method} + undo(): void
+    {method} + redo(): void
+    {method} + setColor(r: number, g: number, b: number): void
+    {method} + setLineWidth(width: number): void
+}
+
+class CanvasManager {
+    {field} - color: HSV | RGB
+    {field} - div: HTMLDivElement
+    {field} - width: number
+    {field} - height: number
+    {field} - historyManager: HistoryManager
+    {field} - layerManager: LayerManager
+    {field} - lineRender: LineRender
+    {field} - pSelectingLayer: number
+    {field} + selectingLayer(): number
+
+    {method} + CanvasManager(div: HTMLDivElement, width: number, height: number): CanvasManager
+    {method} + addLayer(layerNumber?: undefined | number): number
+    {method} + changeMode(mode: PenStyle): void
+    {method} + clearLayer(layerNum: number): void
+    {method} + getIntegratedImage(): string
+    {method} + getLayerImages(): Map<number, string>
+    {method} + getLayerNames(): Map<number, string>
+    {method} + getSortOrder(): number[]
+    {method} + removeLayer(layerNum: number): number | null
+    {method} + renameLayer(layerNum: number, layerName: string): void
+    {method} + selectLayer(layerNum: number): void
+    {method} + undo(): void
+    {method} + redo(): void
+    {method} + setColor(color: HSV | RGB): void
+    {method} + setLineWidth(width: number): void
+    {method} + setSortOrder(sortOrder: number[]): boolean
+    {method} - setEvent(canvas_: HTMLCanvasElement): void
+}
+
+class CircleGL {
+    {field} - fs: WebGLShader | null
+    {field} - fsText: string
+    {field} - gl: WebGL2RenderingContext
+    {field} - height: number
+    {field} - width: number
+    {field} - program: WebGLProgram | null
+    {field} - rDiff: number
+    {field} - size: number
+    {field} - uniformLocations: WebGLUniformLocation[]
+    {field} - vs: WebGLShader | null
+    {field} - vsText: string
+    {field} - width: number
+
+    {method} + CircleGL(canvas: HTMLCanvasElement, width: number, height: number, size: number): CircleGL
+    {method} + render(hue: number): void
+    {method} - createIBO(data: number[]): WebGLBuffer
+    {method} - createProgram(): void
+    {method} - createVBO(data: number[]): WebGLBuffer
+    {method} - init(): void
+    {method} - initShader(): void
+    {method} - setParams(): void
+}
+
+class ColorCircle {
+    {field} - canvas: HTMLCanvasElement
+    {field} - circleGL: CircleGL
+    {field} - div: HTMLDivElement
+    {field} - height: number
+    {field} - hsv: HSV
+    {field} - hueSlider: HTMLDivElement
+    {field} - rDiff: number
+    {field} - size: number
+    {field} - svSlider: HTMLDivElement
+    {field} - width: number = 500
+
+    {method} + ColorCircle(div: HTMLDivElement): ColorCircle
+    {method} + getColor(isHSV: boolean): HSV | RGB
+    {method} - canvas2div(size: number): number
+    {method} - initSlider(): void
+    {method} - updateColor(angle_: number): void
+    {method} - updateHueSlider(angle: number): void
+    {method} - updateSVSlider(s_: number, v_: number): void
+    {method} - angle2rad(angle: number): number
+    {method} - rad2angle(rad: number): number
+}
+
+class HistoryManager {
+    {field} - cnts: Map<number, number>
+    {field} - pointer: number
+    {field} - snapshotInterval: number
+    {field} - stack: History[]
+
+    {method} + do(history: History): void
+    {method} + redo(): History | null
+    {method} + reset(): void
+    {method} + undo(): Array<History> | null
+}
+
+class LayerManager {
+    {field} - cnt: number
+    {field} - ctxs: Map<number, CanvasRenderingContext2D>
+    {field} - div: HTMLDivElement
+    {field} - height: number
+    {field} - layerNum2layerName: Map<number, string>
+    {field} - layers: Map<number, HTMLCanvasElement>
+    {field} - sortOrder: number[]
+    {field} - width: number
+
+    {method} + LayerManager(div: HTMLDivElement, width: number, height: number): LayerManager
+    {method} + addLayer(layerNum?: undefined | number): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D; history: LayerHistory; layerNum: number }
+    {method} + clearLayer(layerNum: number): LayerHistory | null
+    {method} + getImage(): string
+    {method} + getLayerImages(): Map<number, string>
+    {method} + getLayerNames(): Map<number, string>
+    {method} + getLayers(): { canvas: Map<number, HTMLCanvasElement>; ctx: Map<number, CanvasRenderingContext2D> }
+    {method} + getSortOrder(): number[]
+    {method} + redo(hist: LayerHistory): number | null
+    {method} + removeLayer(layerNum: number): { history: LayerHistory; selectedLayerNum: number } | null
+    {method} + renameLayer(layerNum: number, layerName: string): LayerHistory | null
+    {method} + setSortOrder(sortOrder: number[], selecting: number): { hist: LayerHistory; isValid: boolean }
+    {method} + undo(hist: LayerHistory): number | null
+    {method} - createCanvas(layerNum: number): HTMLCanvasElement
+    {method} - sortCanvas(): void
+}
+
+class PenStyle <<Type>> {
+    "Pencil" | "Eraser"
+}
+
+class LineRender {
+    {field} - canvas: HTMLCanvasElement
+    {field} - color: HSV | RGB
+    {field} - ctx: CanvasRenderingContext2D
+    {field} - isDrawing: boolean
+    {field} - layerNum: number
+    {field} - lineWidth: number
+    {field} - mode: PenStyle
+    {field} - pre: { x: number, y:number }
+    {field} - history: LineHistory
+
+    {method} + LineRender(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, layerNum: number): LineRender
+    {method} + changeMode(mode: PenStyle): void
+    {method} + end(): LineHistory | null
+    {method} + redo(hist: LineHistory): void
+    {method} + selectLayer(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, layerNum: number): void
+    {method} + setWidth(width: number): void
+    {method} + start(pos: { x: number; y: number }, color?: HSV | RGB): void
+    {method} + undo(hist: LineHistory): void
+    {method} + update(pos: { x: number; y: number }): void
+    {method} - drawLineByHistory(hist: LineHistory): void
+}
+
+
+
+namespace ColorUtil {
+    class method {
+        {method} + hsv2rgb(hsv: HSV): RGB
+        {method} + rgb2hsv(rgb: RGB): HSV
+    }
+
+    interface HSVInterface {
+        h: number
+        s: number
+        v: number
+    }
+
+    class HSV {
+        {field} + h: number
+        {field} + s: number
+        {field} + v: number
+
+        {method} + HSV(...args: number[]): HSV
+        {method} + [Symbol.iterator](): Generator<number, void, void>
+        {method} + toString(): string
+    }
+
+
+    interface RGBInterface {
+        r: number
+        g: number
+        b: number
+    }
+
+    class RGB {
+        {field} + r: number
+        {field} + g: number
+        {field} + b: number
+
+        {method} + RGB(...args: number[]): RGB
+        {method} + [Symbol.iterator](): Generator<number, void, void>
+        {method} + toString(): string
+    }
+    
+    HSV <|.. HSVInterface
+    RGB <|.. RGBInterface
+}
+
+class History <<Type>> {
+    LineHistory | LayerHistory
+}
+
+interface LayerHistory {
+    {field} + info: {\n\tcommand: "add" | "remove" | "rename" | "clear" | "sort";\n\tlayerName?: [string, string];\n\tlayerNum: number;\n\torder?: number[][];\n\tsnapshot?: ImageData\n}
+    {field} + target: LAYER_HISTORY
+}
+
+interface LineHistory {
+    {field} + info: {\n\tcolor: HSV | RGB;\n\tlayerNum: number;\n\tlineWidth: number;\n\tmode: PenStyle;\n\tpath: Array<{ x: number; y: number }>;\n\tsnapshot: ImageData | null\n}
+    {field} + target : LINE_HISTORY
+}
+
+AnywherePaint *-- CanvasManager
+AnywherePaint *-- ColorCircle
+CanvasManager *-- HistoryManager
+CanvasManager *-- LayerManager
+CanvasManager *-- LineRender
+LineRender *-- PenStyle
+ColorCircle *-- CircleGL
+HistoryManager *-- History
+History o- LayerHistory
+History o- LineHistory
+
+
+
+
+@enduml
