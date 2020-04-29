@@ -16,7 +16,7 @@ export default class HistoryManager {
       ...history.info,
     };
     switch (hist.target) {
-      case HistoryTypes.LINE_HISTORY: {
+      case 'LINE_HISTORY': {
         if (hist.info.color instanceof HSV) {
           hist.info.color = new HSV(...hist.info.color);
         }
@@ -41,7 +41,7 @@ export default class HistoryManager {
         }
         break;
       }
-      case HistoryTypes.LAYER_HISTORY:
+      case 'LAYER_HISTORY':
         break;
       default:
         break;
@@ -60,7 +60,7 @@ export default class HistoryManager {
     const top: History = { ...this.stack[this.pointer] };
     top.info = { ...this.stack[this.pointer].info };
     switch (top.target) {
-      case HistoryTypes.LINE_HISTORY:
+      case 'LINE_HISTORY':
         // if stack top has snapshot
         if (top.info.snapshot) {
           top.info.path = [];
@@ -71,7 +71,7 @@ export default class HistoryManager {
           tmpP -= 1;
           const current: History = { ...this.stack[tmpP] };
           current.info = { ...this.stack[tmpP].info };
-          if (current.target === HistoryTypes.LINE_HISTORY) {
+          if (current.target === 'LINE_HISTORY') {
             if (top.info.layerNum === current.info.layerNum)
               ret.unshift(current);
             if (current.info.snapshot) {
@@ -81,7 +81,7 @@ export default class HistoryManager {
           // eslint-disable-next-line no-constant-condition
         } while (true);
         break;
-      case HistoryTypes.LAYER_HISTORY:
+      case 'LAYER_HISTORY':
         ret.unshift(top);
         break;
       default:

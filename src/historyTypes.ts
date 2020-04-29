@@ -1,13 +1,15 @@
 import { PenStyle } from './lineRender';
 import { HSV, RGB } from './colorUtil';
 
-export enum HistoryTypes {
-  LINE_HISTORY = 'LINE_HISTORY',
-  LAYER_HISTORY = 'LAYER_HISTORY',
+export type HistoryTypes = 'LINE_HISTORY' | 'LAYER_HISTORY';
+
+interface HistoryInterface {
+  target: HistoryTypes;
+  info: object;
 }
 
-export interface LineHistory {
-  target: HistoryTypes.LINE_HISTORY;
+export interface LineHistory extends HistoryInterface {
+  target: 'LINE_HISTORY';
   info: {
     path: Array<{ x: number; y: number }>;
     mode: PenStyle;
@@ -18,8 +20,8 @@ export interface LineHistory {
   };
 }
 
-export interface LayerHistory {
-  target: HistoryTypes.LAYER_HISTORY;
+export interface LayerHistory extends HistoryInterface {
+  target: 'LAYER_HISTORY';
   info: {
     command: 'add' | 'remove' | 'rename' | 'clear' | 'sort';
     layerName?: [string, string];

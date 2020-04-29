@@ -21,7 +21,7 @@ export class LineRender {
   private layerNum = 0;
 
   private history: LineHistory = {
-    target: HistoryTypes.LINE_HISTORY,
+    target: 'LINE_HISTORY',
     info: {
       path: [],
       mode: this.mode,

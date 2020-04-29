@@ -215,18 +215,27 @@ namespace ColorUtil {
     RGB <|.. RGBInterface
 }
 
+class HistoryTypes <<Type>> {
+    "LINE_HISTORY" | "LAYER_HISTORY"
+}
+
 class History <<Type>> {
     LineHistory | LayerHistory
 }
 
+interface HistoryInterface {
+    {field} + target: HistoryTypes
+    {field} + info: object
+}
+
 interface LayerHistory {
     {field} + info: {\n\tcommand: "add" | "remove" | "rename" | "clear" | "sort";\n\tlayerName?: [string, string];\n\tlayerNum: number;\n\torder?: number[][];\n\tsnapshot?: ImageData\n}
-    {field} + target: LAYER_HISTORY
+    {field} + target: "LAYER_HISTORY"
 }
 
 interface LineHistory {
     {field} + info: {\n\tcolor: HSV | RGB;\n\tlayerNum: number;\n\tlineWidth: number;\n\tmode: PenStyle;\n\tpath: Array<{ x: number; y: number }>;\n\tsnapshot: ImageData | null\n}
-    {field} + target : LINE_HISTORY
+    {field} + target : "LINE_HISTORY"
 }
 
 AnywherePaint *-- CanvasManager
@@ -237,8 +246,13 @@ CanvasManager *-- LineRender
 LineRender *-- PenStyle
 ColorCircle *-- CircleGL
 HistoryManager *-- History
-History o- LayerHistory
-History o- LineHistory
+' History o-- LayerHistory
+' History o-- LineHistory
+History o-- HistoryInterface
+HistoryInterface <|.. LayerHistory
+HistoryInterface <|.. LineHistory
+LayerHistory o-- HistoryTypes
+LineHistory o-- HistoryTypes
 
 
 

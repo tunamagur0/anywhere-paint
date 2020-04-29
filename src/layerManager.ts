@@ -59,7 +59,7 @@ export default class LayerManager {
       ctx,
       layerNum: this.cnt,
       history: {
-        target: HistoryTypes.LAYER_HISTORY,
+        target: 'LAYER_HISTORY',
         info: {
           command: 'add',
           layerNum: this.cnt,
@@ -103,7 +103,7 @@ export default class LayerManager {
     return {
       selectedLayerNum: ret,
       history: {
-        target: HistoryTypes.LAYER_HISTORY,
+        target: 'LAYER_HISTORY',
         info: {
           command: 'remove',
           layerNum,
@@ -124,7 +124,7 @@ export default class LayerManager {
     this.layerNum2layerName.set(layerNum, layerName);
 
     return {
-      target: HistoryTypes.LAYER_HISTORY,
+      target: 'LAYER_HISTORY',
       info: {
         command: 'rename',
         layerName: [previousName, layerName],
@@ -290,7 +290,7 @@ export default class LayerManager {
     const image = ctx.getImageData(0, 0, this.width, this.height);
     ctx.clearRect(0, 0, this.width, this.height);
     return {
-      target: HistoryTypes.LAYER_HISTORY,
+      target: 'LAYER_HISTORY',
       info: {
         command: 'clear',
         layerNum,
@@ -308,7 +308,7 @@ export default class LayerManager {
       this.layers.size === new Set(sortOrder).size &&
       this.layers.size === sortOrder.length;
     const hist: LayerHistory = {
-      target: HistoryTypes.LAYER_HISTORY,
+      target: 'LAYER_HISTORY',
       info: {
         command: 'sort',
         layerNum: selecting,

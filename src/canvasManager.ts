@@ -120,7 +120,7 @@ export default class CanvasManager {
     if (hist) {
       const top: History = hist[0];
       switch (top.target) {
-        case HistoryTypes.LINE_HISTORY: {
+        case 'LINE_HISTORY': {
           const layers: {
             canvas: Map<number, HTMLCanvasElement>;
             ctx: Map<number, CanvasRenderingContext2D>;
@@ -138,7 +138,7 @@ export default class CanvasManager {
           break;
         }
 
-        case HistoryTypes.LAYER_HISTORY: {
+        case 'LAYER_HISTORY': {
           const ret: number | null = this.layerManager.undo(top);
           if (top.info.command === 'add') {
             this.selectLayer(ret as number);
@@ -158,7 +158,7 @@ export default class CanvasManager {
     const hist: History | null = this.historyManager.redo();
     if (hist) {
       switch (hist.target) {
-        case HistoryTypes.LINE_HISTORY: {
+        case 'LINE_HISTORY': {
           const layers = this.layerManager.getLayers();
           const { layerNum } = hist.info;
           const canvas = layers.canvas.get(layerNum);
@@ -170,7 +170,7 @@ export default class CanvasManager {
           }
           break;
         }
-        case HistoryTypes.LAYER_HISTORY: {
+        case 'LAYER_HISTORY': {
           const ret: number | null = this.layerManager.redo(hist);
           if (hist.info.command === 'remove') {
             this.selectLayer(ret as number);
