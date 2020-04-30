@@ -1,5 +1,5 @@
 import { HSV } from './colorUtil';
-import { History, HistoryTypes } from './historyTypes';
+import { History } from './historyTypes';
 
 export default class HistoryManager {
   private stack: History[] = [];

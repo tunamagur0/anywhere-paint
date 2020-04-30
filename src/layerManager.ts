@@ -1,4 +1,4 @@
-import { LayerHistory, HistoryTypes } from './historyTypes';
+import { LayerHistory } from './historyTypes';
 
 export default class LayerManager {
   private layers: Map<number, HTMLCanvasElement> = new Map<
@@ -38,13 +38,6 @@ export default class LayerManager {
     history: LayerHistory;
   } {
     this.cnt += 1;
-    const layerName = `layer${this.cnt}`;
-    this.layerNum2layerName.set(this.cnt, layerName);
-    const canvas = this.createCanvas(this.cnt);
-    this.layers.set(this.cnt, canvas);
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    this.ctxs.set(this.cnt, ctx);
-
     const index = this.sortOrder.findIndex((v) => v === layerNum);
     const preOrder = [...this.sortOrder];
     if (layerNum !== undefined && index > 0) {
@@ -53,20 +46,34 @@ export default class LayerManager {
       this.sortOrder.unshift(this.cnt);
     }
 
+    const history: LayerHistory = {
+      target: 'LAYER_HISTORY',
+      info: {
+        command: 'add',
+        layerNum: this.cnt,
+        order: [preOrder, [...this.sortOrder]],
+      },
+    };
+    this.add(history);
     this.sortCanvas();
+    const canvas = [...this.layers.entries()].slice(-1)[0][1];
+    const ctx = [...this.ctxs.entries()].slice(-1)[0][1];
     return {
       canvas,
       ctx,
       layerNum: this.cnt,
-      history: {
-        target: 'LAYER_HISTORY',
-        info: {
-          command: 'add',
-          layerNum: this.cnt,
-          order: [preOrder, [...this.sortOrder]],
-        },
-      },
+      history,
     };
+  }
+
+  private add(hist: LayerHistory): void {
+    const layerName = `layer${hist.info.layerNum}`;
+    this.layerNum2layerName.set(hist.info.layerNum, layerName);
+    const canvas = this.createCanvas(hist.info.layerNum);
+    this.layers.set(hist.info.layerNum, canvas);
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.ctxs.set(hist.info.layerNum, ctx);
+    if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
   }
 
   // returns maximum layerNum
@@ -133,6 +140,7 @@ export default class LayerManager {
     };
   }
 
+  // returns selected layerNum
   public undo(hist: LayerHistory): number | null {
     let ret: number | null = null;
     switch (hist.info.command) {
@@ -142,17 +150,8 @@ export default class LayerManager {
         break;
       }
       case 'remove': {
-        const layerName = `layer${hist.info.layerNum}`;
-        this.layerNum2layerName.set(hist.info.layerNum, layerName);
-        const canvas = this.createCanvas(hist.info.layerNum);
-        this.layers.set(hist.info.layerNum, canvas);
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        this.ctxs.set(hist.info.layerNum, ctx);
-        if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
-
+        this.add(hist);
         ret = hist.info.layerNum;
-        if (hist.info.order) this.sortOrder = [...hist.info.order[0]];
-        this.sortCanvas();
         break;
       }
       case 'rename':
@@ -165,35 +164,25 @@ export default class LayerManager {
           ctx.putImageData(hist.info.snapshot, 0, 0);
         break;
       }
-      case 'sort': {
-        if (hist.info.order) {
-          this.sortOrder = [...hist.info.order[0]];
-          this.sortCanvas();
-        }
+      case 'sort':
         break;
-      }
       default:
         break;
     }
+
+    if (hist.info.order) this.sortOrder = [...hist.info.order[0]];
+    this.sortCanvas();
+
     return ret;
   }
 
+  // returns selected layerNum
   public redo(hist: LayerHistory): number | null {
     let ret: number | null = null;
     switch (hist.info.command) {
       case 'add': {
-        const layerName = `layer${hist.info.layerNum}`;
-        this.layerNum2layerName.set(hist.info.layerNum, layerName);
-        const canvas = this.createCanvas(hist.info.layerNum);
-        this.layers.set(hist.info.layerNum, canvas);
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        this.ctxs.set(hist.info.layerNum, ctx);
-        if (hist.info.snapshot) ctx.putImageData(hist.info.snapshot, 0, 0);
-
+        this.add(hist);
         ret = hist.info.layerNum;
-        if (hist.info.order) this.sortOrder = [...hist.info.order[1]];
-        this.sortCanvas();
-
         break;
       }
       case 'remove': {
@@ -209,16 +198,14 @@ export default class LayerManager {
         this.clearLayer(hist.info.layerNum);
         break;
       }
-      case 'sort': {
-        if (hist.info.order) {
-          this.sortOrder = [...hist.info.order[1]];
-          this.sortCanvas();
-        }
+      case 'sort':
         break;
-      }
       default:
         break;
     }
+    if (hist.info.order) this.sortOrder = [...hist.info.order[1]];
+    this.sortCanvas();
+
     return ret;
   }
 
