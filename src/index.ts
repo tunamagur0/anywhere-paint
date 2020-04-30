@@ -30,6 +30,7 @@ layer.onchange = (e) => {
 const select = document.getElementById('select') as HTMLSelectElement;
 
 const createLayerOption = (layerNum: number) => {
+  if (layerNum === -1) return;
   const option = document.createElement('option');
   option.value = layerNum.toString();
   option.textContent = layerNum.toString();

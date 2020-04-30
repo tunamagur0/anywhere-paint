@@ -1,5 +1,5 @@
 import * as colorUtil from './colorUtil';
-import { LineHistory, HistoryTypes } from './historyTypes';
+import { LineHistory } from './historyTypes';
 
 export type PenStyle = 'Pencil' | 'Eraser';
 

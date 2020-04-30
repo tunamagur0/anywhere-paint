@@ -2,12 +2,7 @@ import LayerManager from './layerManager';
 import HistoryManager from './historyManager';
 import { LineRender, PenStyle } from './lineRender';
 import { HSV, RGB } from './colorUtil';
-import {
-  LayerHistory,
-  HistoryTypes,
-  LineHistory,
-  History,
-} from './historyTypes';
+import { LayerHistory, LineHistory, History } from './historyTypes';
 
 export default class CanvasManager {
   private div: HTMLDivElement;
@@ -140,12 +135,8 @@ export default class CanvasManager {
 
         case 'LAYER_HISTORY': {
           const ret: number | null = this.layerManager.undo(top);
-          if (top.info.command === 'add') {
-            this.selectLayer(ret as number);
-          }
-          if (top.info.command === 'remove') {
-            this.selectLayer(top.info.layerNum);
-          }
+          if (ret !== null) this.selectLayer(ret);
+
           break;
         }
         default:
@@ -172,12 +163,7 @@ export default class CanvasManager {
         }
         case 'LAYER_HISTORY': {
           const ret: number | null = this.layerManager.redo(hist);
-          if (hist.info.command === 'remove') {
-            this.selectLayer(ret as number);
-          }
-          if (hist.info.command === 'add') {
-            this.selectLayer(hist.info.layerNum);
-          }
+          if (ret !== null) this.selectLayer(ret);
           break;
         }
         default:
