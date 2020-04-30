@@ -1,4 +1,4 @@
-import { PenStyle } from './lineRender';
+import { PenStyle } from './penInterface';
 import { HSV, RGB } from './colorUtil';
 
 export type HistoryTypes = 'LINE_HISTORY' | 'LAYER_HISTORY';

@@ -1,6 +1,6 @@
 import ColorCircle from './colorCircle';
 import { RGB, HSV } from './colorUtil';
-import { PenStyle } from './lineRender';
+import { PenStyle } from './penInterface';
 import CanvasManager from './canvasManager';
 
 export default class AnywherePaint {

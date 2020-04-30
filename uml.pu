@@ -147,6 +147,43 @@ class PenStyle <<Type>> {
     "Pencil" | "Eraser"
 }
 
+interface PenInterface {
+    {method} + end(): LineHistory | null
+    {method} + redo(hist: LineHistory, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void
+    {method} + start(pos: { x: number; y: number }, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, history: LineHistory): void
+    {method} + undo(hist: LineHistory, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void
+    {method} + update(pos: { x: number; y: number }): void
+    {method} + drawByHistory(hist: LineHistory, ctx: CanvasRenderingContext2D): void
+}
+
+class PencilRender {
+    {field} - pre: { x: number, y:number }
+    {field} - history: LineHistory
+    {field} - ctx: CanvasRenderingContext2D
+    {field} - isDrawing: boolean
+
+    {method} + end(): LineHistory | null
+    {method} + redo(hist: LineHistory, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void
+    {method} + start(pos: { x: number; y: number }, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, history: LineHistory): void
+    {method} + undo(hist: LineHistory, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void
+    {method} + update(pos: { x: number; y: number }): void
+    {method} + drawByHistory(hist: LineHistory, ctx: CanvasRenderingContext2D): void
+}
+
+class EraserRender {
+    {field} - pre: { x: number, y:number }
+    {field} - history: LineHistory
+    {field} - ctx: CanvasRenderingContext2D
+    {field} - isDrawing: boolean
+
+    {method} + end(): LineHistory | null
+    {method} + redo(hist: LineHistory, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void
+    {method} + start(pos: { x: number; y: number }, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, history: LineHistory): void
+    {method} + undo(hist: LineHistory, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void
+    {method} + update(pos: { x: number; y: number }): void
+    {method} + drawByHistory(hist: LineHistory, ctx: CanvasRenderingContext2D): void
+}
+
 class LineRender {
     {field} - canvas: HTMLCanvasElement
     {field} - color: HSV | RGB
@@ -157,6 +194,7 @@ class LineRender {
     {field} - mode: PenStyle
     {field} - pre: { x: number, y:number }
     {field} - history: LineHistory
+    {field} - penRenders: PenInterface[]
 
     {method} + LineRender(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, layerNum: number): LineRender
     {method} + changeMode(mode: PenStyle): void
@@ -244,6 +282,10 @@ CanvasManager *-- HistoryManager
 CanvasManager *-- LayerManager
 CanvasManager *-- LineRender
 LineRender *-- PenStyle
+LineRender o-- PencilRender
+LineRender o-- EraserRender
+PenInterface <|.. PencilRender
+PenInterface <|.. EraserRender
 ColorCircle *-- CircleGL
 HistoryManager *-- History
 ' History o-- LayerHistory

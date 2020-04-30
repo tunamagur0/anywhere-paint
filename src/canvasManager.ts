@@ -1,6 +1,7 @@
 import LayerManager from './layerManager';
 import HistoryManager from './historyManager';
-import { LineRender, PenStyle } from './lineRender';
+import LineRender from './lineRender';
+import { PenStyle } from './penInterface';
 import { HSV, RGB } from './colorUtil';
 import { LayerHistory, LineHistory, History } from './historyTypes';
 

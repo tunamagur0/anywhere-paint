@@ -1,9 +1,10 @@
 import * as colorUtil from './colorUtil';
 import { LineHistory } from './historyTypes';
+import { PenInterface, PenStyle } from './penInterface';
+import PencilRender from './pencilRender';
+import EraserRender from './eraserRender';
 
-export type PenStyle = 'Pencil' | 'Eraser';
-
-export class LineRender {
+export default class LineRender {
   private canvas: HTMLCanvasElement;
 
   private ctx: CanvasRenderingContext2D;
@@ -19,6 +20,11 @@ export class LineRender {
   private lineWidth = 1;
 
   private layerNum = 0;
+
+  private penRenders: Map<PenStyle, PenInterface> = new Map<
+    PenStyle,
+    PenInterface
+  >();
 
   private history: LineHistory = {
     target: 'LINE_HISTORY',
@@ -40,6 +46,8 @@ export class LineRender {
     this.canvas = canvas;
     this.ctx = ctx;
     this.layerNum = layerNum;
+    this.penRenders.set('Pencil', new PencilRender());
+    this.penRenders.set('Eraser', new EraserRender());
   }
 
   public selectLayer(
@@ -53,8 +61,7 @@ export class LineRender {
   }
 
   public changeMode(mode: PenStyle): void {
-    const tmp: PenStyle = mode;
-    this.mode = tmp;
+    this.mode = mode;
   }
 
   public setWidth(width: number): void {
@@ -66,96 +73,59 @@ export class LineRender {
     pos: { x: number; y: number },
     color: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0)
   ): void {
-    this.ctx.lineCap = 'round';
-    this.ctx.lineJoin = 'round';
-    this.isDrawing = true;
-    this.pre = pos;
-    this.color = color;
-    this.ctx.strokeStyle = color.toString();
-    this.ctx.lineWidth = this.lineWidth;
-
-    this.history.info.path.push(pos);
-    this.history.info.color = color;
-    this.history.info.mode = this.mode;
-    this.history.info.snapshot = this.ctx.getImageData(
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
-    this.history.info.lineWidth = this.lineWidth;
-    this.history.info.layerNum = this.layerNum;
+    const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
+    if (!penRender) {
+      throw new Error(`cannot find ${this.mode}`);
+    }
+    const history: LineHistory = {
+      target: 'LINE_HISTORY',
+      info: {
+        path: [pos],
+        mode: this.mode,
+        color,
+        lineWidth: this.lineWidth,
+        snapshot: this.ctx.getImageData(
+          0,
+          0,
+          this.canvas.width,
+          this.canvas.height
+        ),
+        layerNum: this.layerNum,
+      },
+    };
+    penRender.start(pos, this.canvas, this.ctx, history);
   }
 
   public update(pos: { x: number; y: number }): void {
-    if (!this.isDrawing) return;
-
-    switch (this.mode) {
-      case 'Pencil':
-        this.ctx.globalCompositeOperation = 'source-over';
-        break;
-      case 'Eraser':
-        this.ctx.globalCompositeOperation = 'destination-out';
-        break;
-      default:
-        this.ctx.globalCompositeOperation = 'source-over';
-        break;
+    const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
+    if (!penRender) {
+      throw new Error(`cannot find ${this.mode}`);
     }
-
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.pre.x, this.pre.y);
-    this.ctx.lineTo(pos.x, pos.y);
-    this.ctx.stroke();
-    this.pre = pos;
-    this.history.info.path.push(pos);
+    penRender.update(pos);
   }
 
   public end(): LineHistory | null {
-    let ret = null;
-    if (this.isDrawing) {
-      this.isDrawing = false;
-      ret = { ...this.history };
-      ret.info = { ...this.history.info };
-      this.history.info.path = [];
+    const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
+    if (!penRender) {
+      throw new Error(`cannot find ${this.mode}`);
     }
+    const ret = penRender.end();
     return ret;
   }
 
   public undo(hist: LineHistory): void {
-    if (hist.info.snapshot) {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.putImageData(hist.info.snapshot as ImageData, 0, 0);
+    const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
+    if (!penRender) {
+      throw new Error(`cannot find ${this.mode}`);
     }
-
-    this.drawLineByHistory(hist);
+    penRender.undo(hist, this.ctx, this.canvas);
   }
 
   public redo(hist: LineHistory): void {
-    this.drawLineByHistory(hist);
-  }
-
-  private drawLineByHistory(hist: LineHistory): void {
-    switch (hist.info.mode) {
-      case 'Pencil':
-        this.ctx.globalCompositeOperation = 'source-over';
-        break;
-      case 'Eraser':
-        this.ctx.globalCompositeOperation = 'destination-out';
-        break;
-      default:
-        this.ctx.globalCompositeOperation = 'source-over';
-        break;
+    const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
+    if (!penRender) {
+      throw new Error(`cannot find ${this.mode}`);
     }
-    this.ctx.strokeStyle = hist.info.color.toString();
-    this.ctx.lineWidth = hist.info.lineWidth;
-    this.ctx.lineCap = 'round';
-    this.ctx.lineJoin = 'round';
-
-    this.ctx.beginPath();
-    for (let i = 0; i < hist.info.path.length - 1; i += 1) {
-      this.ctx.moveTo(hist.info.path[i].x, hist.info.path[i].y);
-      this.ctx.lineTo(hist.info.path[i + 1].x, hist.info.path[i + 1].y);
-    }
-    this.ctx.stroke();
+    penRender.redo(hist, this.ctx, this.canvas);
   }
 }
