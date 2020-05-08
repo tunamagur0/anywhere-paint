@@ -10,7 +10,7 @@ export interface PenInterface {
     canvas: HTMLCanvasElement
   ): void;
   start(
-    pos: { x: number; y: number },
+    info: { x: number; y: number; pressure: number },
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     history: LineHistory
@@ -20,6 +20,6 @@ export interface PenInterface {
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement
   ): void;
-  update(pos: { x: number; y: number }): void;
+  update(info: { x: number; y: number; pressure: number }): void;
   drawByHistory(hist: LineHistory, ctx: CanvasRenderingContext2D): void;
 }

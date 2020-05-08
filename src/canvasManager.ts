@@ -72,7 +72,7 @@ export default class CanvasManager {
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.clientX - rect.left;
       const y: number = e.clientY - rect.top;
-      this.lineRender.start({ x, y }, this.color);
+      this.lineRender.start({ x, y, pressure: e.pressure }, this.color);
     };
     window.onpointerup = (): void => {
       const hist = this.lineRender.end();
@@ -82,7 +82,7 @@ export default class CanvasManager {
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.clientX - rect.left;
       const y: number = e.clientY - rect.top;
-      this.lineRender.update({ x, y });
+      this.lineRender.update({ x, y, pressure: e.pressure });
     };
   }
 

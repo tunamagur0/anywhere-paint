@@ -9,11 +9,7 @@ export default class LineRender {
 
   private ctx: CanvasRenderingContext2D;
 
-  private isDrawing = false;
-
   private mode: PenStyle = 'Pencil';
-
-  private pre: { x: number; y: number } = { x: 0, y: 0 };
 
   private color: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0);
 
@@ -25,18 +21,6 @@ export default class LineRender {
     PenStyle,
     PenInterface
   >();
-
-  private history: LineHistory = {
-    target: 'LINE_HISTORY',
-    info: {
-      path: [],
-      mode: this.mode,
-      color: this.color,
-      lineWidth: this.lineWidth,
-      snapshot: null,
-      layerNum: this.layerNum,
-    },
-  };
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -70,7 +54,7 @@ export default class LineRender {
   }
 
   public start(
-    pos: { x: number; y: number },
+    info: { x: number; y: number; pressure: number },
     color: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0)
   ): void {
     const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
@@ -80,7 +64,7 @@ export default class LineRender {
     const history: LineHistory = {
       target: 'LINE_HISTORY',
       info: {
-        path: [pos],
+        path: [info],
         mode: this.mode,
         color,
         lineWidth: this.lineWidth,
@@ -93,15 +77,15 @@ export default class LineRender {
         layerNum: this.layerNum,
       },
     };
-    penRender.start(pos, this.canvas, this.ctx, history);
+    penRender.start(info, this.canvas, this.ctx, history);
   }
 
-  public update(pos: { x: number; y: number }): void {
+  public update(info: { x: number; y: number; pressure: number }): void {
     const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
     if (!penRender) {
       throw new Error(`cannot find ${this.mode}`);
     }
-    penRender.update(pos);
+    penRender.update(info);
   }
 
   public end(): LineHistory | null {

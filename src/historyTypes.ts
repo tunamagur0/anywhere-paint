@@ -11,7 +11,7 @@ interface HistoryInterface {
 export interface LineHistory extends HistoryInterface {
   target: 'LINE_HISTORY';
   info: {
-    path: Array<{ x: number; y: number }>;
+    path: Array<{ x: number; y: number; pressure: number }>;
     mode: PenStyle;
     color: HSV | RGB;
     lineWidth: number;

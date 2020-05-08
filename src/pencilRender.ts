@@ -3,7 +3,12 @@ import { LineHistory } from './historyTypes';
 import { HSV } from './colorUtil';
 
 export default class PencilRender implements PenInterface {
-  private pre: { x: number; y: number } = { x: 0, y: 0 };
+  private pre: { x: number; y: number; pressure: number; width: number } = {
+    x: 0,
+    y: 0,
+    pressure: 1,
+    width: 1,
+  };
 
   private history: LineHistory = {
     target: 'LINE_HISTORY',
@@ -42,7 +47,7 @@ export default class PencilRender implements PenInterface {
   }
 
   start(
-    pos: { x: number; y: number },
+    info: { x: number; y: number; pressure: number },
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     history: LineHistory
@@ -53,11 +58,14 @@ export default class PencilRender implements PenInterface {
     this.ctx.lineJoin = 'round';
     this.ctx.globalCompositeOperation = 'source-over';
     this.isDrawing = true;
-    this.pre = pos;
+    this.pre = { ...info, width: history.info.lineWidth };
     this.ctx.strokeStyle = history.info.color.toString();
-    this.ctx.lineWidth = history.info.lineWidth;
+    this.ctx.lineWidth = PencilRender.getWidth(
+      history.info.lineWidth,
+      info.pressure
+    );
 
-    this.history.info.path.push(pos);
+    this.history.info.path.push(info);
     this.history.info.mode = 'Pencil';
     this.history.info.snapshot = this.ctx.getImageData(
       0,
@@ -80,14 +88,15 @@ export default class PencilRender implements PenInterface {
     this.drawByHistory(hist, ctx);
   }
 
-  update(pos: { x: number; y: number }): void {
+  update(info: { x: number; y: number; pressure: number }): void {
     if (!this.isDrawing || !this.ctx) return;
+    this.ctx.lineWidth = PencilRender.getWidth(this.pre.width, info.pressure);
     this.ctx.beginPath();
     this.ctx.moveTo(this.pre.x, this.pre.y);
-    this.ctx.lineTo(pos.x, pos.y);
+    this.ctx.lineTo(info.x, info.y);
     this.ctx.stroke();
-    this.pre = pos;
-    this.history.info.path.push(pos);
+    this.pre = { ...info, width: this.pre.width };
+    this.history.info.path.push(info);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -104,5 +113,9 @@ export default class PencilRender implements PenInterface {
       ctx.lineTo(hist.info.path[i + 1].x, hist.info.path[i + 1].y);
     }
     ctx.stroke();
+  }
+
+  static getWidth(width: number, pressure: number): number {
+    return width * pressure;
   }
 }
