@@ -20,6 +20,10 @@ export default class CanvasManager {
 
   private color: HSV | RGB = new HSV(0, 0, 0);
 
+  private currentId = -1;
+
+  private isDrawing = false;
+
   private pSelectingLayer = 0;
 
   constructor(div: HTMLDivElement, width: number, height: number) {
@@ -69,16 +73,22 @@ export default class CanvasManager {
   private setEvent(canvas_: HTMLCanvasElement): void {
     const canvas = canvas_;
     canvas.onpointerdown = (e: PointerEvent): void => {
+      if (this.isDrawing) return;
+      this.currentId = e.pointerId;
+      this.isDrawing = true;
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.clientX - rect.left;
       const y: number = e.clientY - rect.top;
       this.lineRender.start({ x, y, pressure: e.pressure }, this.color);
     };
-    window.onpointerup = (): void => {
+    window.onpointerup = (e: PointerEvent): void => {
+      if (!this.isDrawing || e.pointerId !== this.currentId) return;
+      this.isDrawing = false;
       const hist = this.lineRender.end();
       if (hist) this.historyManager.do(hist);
     };
     window.onpointermove = (e: PointerEvent): void => {
+      if (!this.isDrawing || e.pointerId !== this.currentId) return;
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.clientX - rect.left;
       const y: number = e.clientY - rect.top;

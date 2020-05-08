@@ -11,8 +11,6 @@ export default class LineRender {
 
   private mode: PenStyle = 'Pencil';
 
-  private color: colorUtil.HSV | colorUtil.RGB = new colorUtil.HSV(0, 0, 0);
-
   private lineWidth = 1;
 
   private layerNum = 0;
