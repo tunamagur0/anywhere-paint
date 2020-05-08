@@ -32,6 +32,7 @@ export default class ColorCircle {
     const min = `${Math.min(div.clientWidth, div.clientHeight)}px`;
     this.div.style.width = min;
     this.div.style.height = min;
+    this.div.style.touchAction = 'none';
 
     this.hueSlider = document.createElement('div');
     this.div.appendChild(this.hueSlider);
@@ -42,6 +43,7 @@ export default class ColorCircle {
     this.canvas.style.width = min;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+    this.canvas.style.touchAction = 'none';
     this.div.appendChild(this.canvas);
 
     this.circleGL = new CircleGL(
@@ -129,7 +131,7 @@ export default class ColorCircle {
 
     let hueFlag = false;
     let svFlag = false;
-    this.div.addEventListener('mousedown', (e) => {
+    this.div.addEventListener('pointerdown', (e: PointerEvent) => {
       const centerX: number = this.div.clientWidth / 2;
       const centerY: number = this.div.clientHeight / 2;
       const rect: DOMRect = this.div.getBoundingClientRect();
@@ -147,7 +149,7 @@ export default class ColorCircle {
       }
     });
 
-    const updateHue = (e: MouseEvent): void => {
+    const updateHue = (e: PointerEvent): void => {
       if (hueFlag) {
         const centerX: number = this.div.clientWidth / 2;
         const centerY: number = this.div.clientHeight / 2;
@@ -164,7 +166,7 @@ export default class ColorCircle {
       }
     };
 
-    const updateSV = (e: MouseEvent): void => {
+    const updateSV = (e: PointerEvent): void => {
       if (svFlag) {
         const centerX: number = this.div.clientWidth / 2;
         const centerY: number = this.div.clientHeight / 2;
@@ -184,12 +186,12 @@ export default class ColorCircle {
       }
     };
 
-    this.div.addEventListener('mousemove', (e: MouseEvent) => {
+    this.div.addEventListener('pointermove', (e: PointerEvent) => {
       updateHue(e);
       updateSV(e);
     });
 
-    window.addEventListener('mouseup', (e: MouseEvent) => {
+    window.addEventListener('pointerup', (e: PointerEvent) => {
       updateHue(e);
       updateSV(e);
       hueFlag = false;

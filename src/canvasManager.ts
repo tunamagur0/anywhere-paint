@@ -68,17 +68,17 @@ export default class CanvasManager {
 
   private setEvent(canvas_: HTMLCanvasElement): void {
     const canvas = canvas_;
-    canvas.onmousedown = (e: MouseEvent): void => {
+    canvas.onpointerdown = (e: PointerEvent): void => {
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.clientX - rect.left;
       const y: number = e.clientY - rect.top;
       this.lineRender.start({ x, y }, this.color);
     };
-    window.onmouseup = (): void => {
+    window.onpointerup = (): void => {
       const hist = this.lineRender.end();
       if (hist) this.historyManager.do(hist);
     };
-    window.onmousemove = (e: MouseEvent): void => {
+    window.onpointermove = (e: PointerEvent): void => {
       const rect: DOMRect = canvas.getBoundingClientRect();
       const x: number = e.clientX - rect.left;
       const y: number = e.clientY - rect.top;

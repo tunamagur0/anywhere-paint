@@ -70,6 +70,7 @@ export default class LayerManager {
     const layerName = `layer${hist.info.layerNum}`;
     this.layerNum2layerName.set(hist.info.layerNum, layerName);
     const canvas = this.createCanvas(hist.info.layerNum);
+    canvas.style.touchAction = 'none';
     this.layers.set(hist.info.layerNum, canvas);
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     this.ctxs.set(hist.info.layerNum, ctx);
