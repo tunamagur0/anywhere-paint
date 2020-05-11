@@ -15,16 +15,18 @@ button.onclick = () => {
   awPaint.setLineWidth(width);
 };
 awPaint.createColorCircle(document.getElementById('circle') as HTMLDivElement);
-const checkBox = document.getElementById('is-eraser') as HTMLInputElement;
-checkBox.onclick = (e) => {
-  const target = e.target as HTMLInputElement;
-  awPaint.changeMode(target.checked ? 'Eraser' : 'Pencil');
-};
-
-const layer = document.getElementById('is-eraser') as HTMLInputElement;
-layer.onchange = (e) => {
-  const target = e.target as HTMLInputElement;
-  awPaint.selectLayer(target.checked ? 1 : 0);
+const pen = document.getElementById('pen') as HTMLSelectElement;
+pen.onchange = (e) => {
+  const target = e.target as HTMLSelectElement;
+  console.log(target.selectedIndex);
+  const ma: Map<number, string> = new Map([
+    [0, 'Pencil'],
+    [1, 'Eraser'],
+    [2, 'Fill'],
+  ]);
+  awPaint.changeMode(
+    ma.get(target.selectedIndex) as 'Pencil' | 'Eraser' | 'Fill'
+  );
 };
 
 const select = document.getElementById('select') as HTMLSelectElement;

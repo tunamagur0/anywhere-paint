@@ -114,6 +114,10 @@ export default class EraserRender implements PenInterface {
 
     ctx.beginPath();
     for (let i = 0; i < hist.info.path.length - 1; i += 1) {
+      ctx.lineWidth = EraserRender.getWidth(
+        hist.info.lineWidth,
+        hist.info.path[i].pressure
+      );
       ctx.moveTo(hist.info.path[i].x, hist.info.path[i].y);
       ctx.lineTo(hist.info.path[i + 1].x, hist.info.path[i + 1].y);
     }

@@ -77,8 +77,8 @@ export default class CanvasManager {
       this.currentId = e.pointerId;
       this.isDrawing = true;
       const rect: DOMRect = canvas.getBoundingClientRect();
-      const x: number = e.clientX - rect.left;
-      const y: number = e.clientY - rect.top;
+      const x: number = Math.round(e.clientX - rect.left);
+      const y: number = Math.round(e.clientY - rect.top);
       this.lineRender.start({ x, y, pressure: e.pressure }, this.color);
     };
     window.onpointerup = (e: PointerEvent): void => {
@@ -90,8 +90,8 @@ export default class CanvasManager {
     window.onpointermove = (e: PointerEvent): void => {
       if (!this.isDrawing || e.pointerId !== this.currentId) return;
       const rect: DOMRect = canvas.getBoundingClientRect();
-      const x: number = e.clientX - rect.left;
-      const y: number = e.clientY - rect.top;
+      const x: number = Math.round(e.clientX - rect.left);
+      const y: number = Math.round(e.clientY - rect.top);
       this.lineRender.update({ x, y, pressure: e.pressure });
     };
   }

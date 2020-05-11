@@ -1,6 +1,6 @@
 import { LineHistory } from './historyTypes';
 
-export type PenStyle = 'Pencil' | 'Eraser';
+export type PenStyle = 'Pencil' | 'Eraser' | 'Fill';
 
 export interface PenInterface {
   end(): LineHistory | null;

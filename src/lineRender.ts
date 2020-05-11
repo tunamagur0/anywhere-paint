@@ -3,6 +3,7 @@ import { LineHistory } from './historyTypes';
 import { PenInterface, PenStyle } from './penInterface';
 import PencilRender from './pencilRender';
 import EraserRender from './eraserRender';
+import FillRender from './fillRender';
 
 export default class LineRender {
   private canvas: HTMLCanvasElement;
@@ -30,6 +31,7 @@ export default class LineRender {
     this.layerNum = layerNum;
     this.penRenders.set('Pencil', new PencilRender());
     this.penRenders.set('Eraser', new EraserRender());
+    this.penRenders.set('Fill', new FillRender());
   }
 
   public selectLayer(
@@ -96,17 +98,21 @@ export default class LineRender {
   }
 
   public undo(hist: LineHistory): void {
-    const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
+    const penRender: PenInterface | undefined = this.penRenders.get(
+      hist.info.mode
+    );
     if (!penRender) {
-      throw new Error(`cannot find ${this.mode}`);
+      throw new Error(`cannot find ${hist.info.mode}`);
     }
     penRender.undo(hist, this.ctx, this.canvas);
   }
 
   public redo(hist: LineHistory): void {
-    const penRender: PenInterface | undefined = this.penRenders.get(this.mode);
+    const penRender: PenInterface | undefined = this.penRenders.get(
+      hist.info.mode
+    );
     if (!penRender) {
-      throw new Error(`cannot find ${this.mode}`);
+      throw new Error(`cannot find ${hist.info.mode}`);
     }
     penRender.redo(hist, this.ctx, this.canvas);
   }
