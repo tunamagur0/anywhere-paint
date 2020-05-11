@@ -35,7 +35,7 @@ color is automatically picked when you draw lines.
 
 ```
 awPaint.undo();
-awPatin.redo();
+awPaint.redo();
 ```
 
 ### Layers
@@ -130,7 +130,7 @@ awPaint.changeMode(style);
 ```
 
 Change drawing mode.
-style is "Pencil" or "Eraser".
+style is "Pencil", "Eraser" or "Fill".
 
 # Properties
 
