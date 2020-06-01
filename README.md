@@ -3,6 +3,10 @@
 `anywhere-paint` is a library to create painting apps.
 Sample is [here](https://tunamagur0.github.io/anywhere-paint-sample)!
 
+## DEMO
+
+![demo](/screenshot.gif?raw=true, 'demo')
+
 ## Installation
 
 `npm install --save anywhere-paint`
