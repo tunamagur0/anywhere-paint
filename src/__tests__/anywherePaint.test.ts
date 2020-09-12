@@ -117,6 +117,21 @@ describe('test lib', () => {
       });
     });
 
+    describe('clear layer', () => {
+      it('exist', () => {
+        if (!awPaint) return;
+        const layerImages = awPaint.getLayerImages();
+        awPaint.clearLayer(0);
+        expect(awPaint.getLayerImages()).toStrictEqual(layerImages);
+      });
+      it('not exist', () => {
+        if (!awPaint) return;
+        const layerImages = awPaint.getLayerImages();
+        awPaint.clearLayer(1);
+        expect(awPaint.getLayerImages()).toStrictEqual(layerImages);
+      });
+    });
+
     describe('sort layer', () => {
       it('sort', () => {
         if (!awPaint) return;
