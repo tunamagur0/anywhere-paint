@@ -157,7 +157,7 @@ export default class LayerManager {
       }
       case 'rename':
         if (hist.info.layerName)
-          this.renameLayer(hist.info.layerNum, hist.info.layerName[1]);
+          this.renameLayer(hist.info.layerNum, hist.info.layerName[0]);
         break;
       case 'clear': {
         const ctx = this.ctxs.get(hist.info.layerNum);
