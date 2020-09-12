@@ -169,6 +169,15 @@ describe('test lib', () => {
         expect(awPaint.setSortOrder(sameNumOrder)).toStrictEqual(false);
         expect(awPaint.getSortOrder()).toStrictEqual(validOrder);
       });
+
+      describe('get image', () => {
+        it('one layer image equals to integrated image', () => {
+          if (!awPaint) return;
+          const images = awPaint.getLayerImages();
+          const image = images.get(0);
+          expect(awPaint.getIntegratedImage()).toBe(image);
+        });
+      });
     });
   });
 
