@@ -1,5 +1,8 @@
 # anywhere-paint
 
+![Test](https://github.com/tunamagur0/anywhere-paint/workflows/Test/badge.svg)
+[![npm version](https://badge.fury.io/js/anywhere-paint.svg)](https://badge.fury.io/js/anywhere-paint)
+
 `anywhere-paint` is a library to create painting apps.
 Sample is [here](https://tunamagur0.github.io/anywhere-paint-sample)!
 
