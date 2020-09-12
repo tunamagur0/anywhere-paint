@@ -188,7 +188,10 @@ export default class CanvasManager {
   }
 
   public renameLayer(layerNum: number, layerName: string): void {
-    this.layerManager.renameLayer(layerNum, layerName);
+    const history = this.layerManager.renameLayer(layerNum, layerName);
+    if (history) {
+      this.historyManager.do(history);
+    }
   }
 
   public getLayerImages(): Map<number, string> {

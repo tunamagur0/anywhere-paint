@@ -3,3 +3,4 @@ dist/*
 lib/*
 public/bundle.js
 doc/
+coverage/
