@@ -1,12 +1,43 @@
-import AnyWherePaint from '../anywherePaint';
+import AnywherePaint from '../anywherePaint';
 
+const drawByPath = (
+  awPaint: AnywherePaint,
+  paths: { clientX: number; clientY: number; pressure?: number }[]
+): void => {
+  const canvas = document.getElementById(
+    `anywhere-paint-layer${awPaint.selectingLayer}`
+  ) as HTMLCanvasElement;
+
+  (canvas as any).onpointerdown(new PointerEvent('pointerdown', paths[0]));
+  for (const path of paths) {
+    (window as any).onpointermove(new PointerEvent('pointermove', path));
+  }
+  (window as any).onpointerup(
+    new PointerEvent('pointerup', paths[paths.length - 1])
+  );
+};
+
+const getLayerInfo = (
+  awPaint: AnywherePaint
+): {
+  order: number[];
+  images: Map<number, string>;
+  names: Map<number, string>;
+} => ({
+  order: awPaint.getSortOrder(),
+  images: awPaint.getLayerImages(),
+  names: awPaint.getLayerNames(),
+});
+
+const width = 640;
+const height = 480;
 describe('test lib', () => {
-  let awPaint: AnyWherePaint | null = null;
+  let awPaint: AnywherePaint | null = null;
   let div: HTMLDivElement | null = null;
   beforeEach(() => {
     div = document.createElement('div');
     document.body.appendChild(div);
-    awPaint = new AnyWherePaint(div, 640, 480);
+    awPaint = new AnywherePaint(div, width, height);
   });
 
   afterEach(() => {
@@ -181,6 +212,55 @@ describe('test lib', () => {
     });
   });
 
+  describe('draw', () => {
+    it('draw line freely', () => {
+      if (!awPaint) return;
+      const paths = [
+        { clientX: 10, clientY: 10 },
+        { clientX: 20, clientY: 20 },
+        { clientX: 30, clientY: 30 },
+      ];
+      const images = awPaint.getLayerImages();
+      drawByPath(awPaint, paths);
+      expect(awPaint.getLayerImages()).not.toStrictEqual(images);
+    });
+
+    it('fill', () => {
+      if (!awPaint) return;
+      // create black filled image
+      const dummy = document.createElement('canvas') as HTMLCanvasElement;
+      const dummyCtx = dummy.getContext('2d') as CanvasRenderingContext2D;
+      dummy.width = width;
+      dummy.height = height;
+      const filledImage = dummyCtx.createImageData(width, height);
+      const { data } = filledImage;
+      for (let i = 0; i < data.byteLength; i += 1)
+        data[i] = (i + 1) % 4 === 0 ? 255 : 0;
+      dummyCtx.putImageData(filledImage, 0, 0);
+      const imageURL = dummy.toDataURL();
+
+      const paths = [{ clientX: 10, clientY: 10 }];
+      awPaint.changeMode('Fill');
+      drawByPath(awPaint, paths);
+      expect(awPaint.getLayerImages().get(0)).toStrictEqual(imageURL);
+    });
+
+    it('erase same path', () => {
+      if (!awPaint) return;
+      const paths = [
+        { clientX: 10, clientY: 10 },
+        { clientX: 20, clientY: 20 },
+        { clientX: 30, clientY: 30 },
+      ];
+      const images = awPaint.getLayerImages();
+      drawByPath(awPaint, paths);
+      awPaint.changeMode('Eraser');
+      awPaint.setLineWidth(3);
+      drawByPath(awPaint, paths);
+      expect(awPaint.getLayerImages()).toStrictEqual(images);
+    });
+  });
+
   describe('undo', () => {
     it('there is no history', () => {
       if (!awPaint) return;
@@ -190,18 +270,6 @@ describe('test lib', () => {
     });
 
     describe('layer', () => {
-      const getLayerInfo = (
-        _awPaint: AnyWherePaint
-      ): {
-        order: number[];
-        images: Map<number, string>;
-        names: Map<number, string>;
-      } => ({
-        order: _awPaint.getSortOrder(),
-        images: _awPaint.getLayerImages(),
-        names: _awPaint.getLayerNames(),
-      });
-
       it('add layer', () => {
         if (!awPaint) return;
         awPaint.addLayer();
@@ -236,6 +304,50 @@ describe('test lib', () => {
         awPaint.undo();
         const after = getLayerInfo(awPaint);
         expect(pre).toStrictEqual(after);
+      });
+
+      it('draw once and undo', () => {
+        if (!awPaint) return;
+        const paths = [
+          { clientX: 10, clientY: 10 },
+          { clientX: 15, clientY: 20 },
+          { clientX: 20, clientY: 30 },
+        ];
+        drawByPath(awPaint, paths);
+        const images = awPaint.getLayerImages();
+        awPaint.undo();
+
+        // Unfortunately, image rendered by ctx.lineTo is different from by ctx.putImage
+        expect(awPaint.getLayerImages()).not.toStrictEqual(images);
+      });
+
+      it('draw twice and undo', () => {
+        if (!awPaint) return;
+        const paths = [
+          { clientX: 10, clientY: 10 },
+          { clientX: 15, clientY: 20 },
+          { clientX: 20, clientY: 30 },
+          { clientX: 20, clientY: 10 },
+          { clientX: 15, clientY: 20 },
+          { clientX: 10, clientY: 30 },
+        ];
+        drawByPath(awPaint, paths.slice(0, 3));
+        const images = awPaint.getLayerImages();
+        drawByPath(awPaint, paths.slice(3, 5));
+        awPaint.undo();
+
+        // Unfortunately, image rendered by ctx.lineTo is different from by ctx.putImage
+        expect(awPaint.getLayerImages()).not.toStrictEqual(images);
+      });
+
+      it('fill and undo', () => {
+        if (!awPaint) return;
+        const paths = [{ clientX: 10, clientY: 10 }];
+        awPaint.changeMode('Fill');
+        const images = awPaint.getLayerImages();
+        drawByPath(awPaint, paths);
+        awPaint.undo();
+        expect(awPaint.getLayerImages()).toStrictEqual(images);
       });
     });
   });
@@ -250,18 +362,6 @@ describe('test lib', () => {
     });
 
     describe('layer', () => {
-      const getLayerInfo = (
-        _awPaint: AnyWherePaint
-      ): {
-        order: number[];
-        images: Map<number, string>;
-        names: Map<number, string>;
-      } => ({
-        order: _awPaint.getSortOrder(),
-        images: _awPaint.getLayerImages(),
-        names: _awPaint.getLayerNames(),
-      });
-
       it('add layer', () => {
         if (!awPaint) return;
         awPaint.addLayer();
@@ -300,6 +400,47 @@ describe('test lib', () => {
         awPaint.redo();
         const after = getLayerInfo(awPaint);
         expect(pre).toStrictEqual(after);
+      });
+
+      it('draw and undo and redo', () => {
+        if (!awPaint) return;
+        const paths = [
+          { clientX: 10, clientY: 10 },
+          { clientX: 15, clientY: 20 },
+          { clientX: 20, clientY: 30 },
+          { clientX: 20, clientY: 10 },
+          { clientX: 15, clientY: 20 },
+          { clientX: 10, clientY: 30 },
+        ];
+        drawByPath(awPaint, paths.slice(0, 3));
+        drawByPath(awPaint, paths.slice(3, 5));
+        awPaint.undo();
+        const images = awPaint.getLayerImages();
+        awPaint.undo();
+        awPaint.redo();
+        expect(awPaint.getLayerImages()).toStrictEqual(images);
+      });
+
+      it('fill and undo and redo', () => {
+        if (!awPaint) return;
+        // create black filled image
+        const dummy = document.createElement('canvas') as HTMLCanvasElement;
+        const dummyCtx = dummy.getContext('2d') as CanvasRenderingContext2D;
+        dummy.width = width;
+        dummy.height = height;
+        const filledImage = dummyCtx.createImageData(width, height);
+        const { data } = filledImage;
+        for (let i = 0; i < data.byteLength; i += 1)
+          data[i] = (i + 1) % 4 === 0 ? 255 : 0;
+        dummyCtx.putImageData(filledImage, 0, 0);
+        const imageURL = dummy.toDataURL();
+
+        const paths = [{ clientX: 10, clientY: 10 }];
+        awPaint.changeMode('Fill');
+        drawByPath(awPaint, paths);
+        awPaint.undo();
+        awPaint.redo();
+        expect(awPaint.getLayerImages().get(0)).toStrictEqual(imageURL);
       });
     });
   });
