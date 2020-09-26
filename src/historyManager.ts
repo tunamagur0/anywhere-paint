@@ -10,6 +10,8 @@ export default class HistoryManager {
 
   private snapshotInterval = 10;
 
+  private listener: ((history: History) => void) | null = null;
+
   public do(history: History): void {
     const hist: History = { ...history };
     hist.info = {
@@ -50,6 +52,9 @@ export default class HistoryManager {
     this.stack = this.stack.slice(0, this.pointer);
     this.stack.push(hist);
     this.pointer += 1;
+    if (this.listener !== null && hist !== null) {
+      this.listener(hist);
+    }
   }
 
   public undo(): Array<History> | null {
@@ -100,5 +105,13 @@ export default class HistoryManager {
     this.stack = [];
     this.pointer = 0;
     this.cnts = new Map<number, number>();
+  }
+
+  public registerListener(listener: (history: History) => void): void {
+    this.listener = listener;
+  }
+
+  public unregisterListener(): void {
+    this.listener = null;
   }
 }

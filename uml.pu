@@ -25,6 +25,18 @@ class AnywherePaint {
     {method} + redo(): void
     {method} + setColor(r: number, g: number, b: number): void
     {method} + setLineWidth(width: number): void
+    {method} + addEventListener(callback: (history: History) => void): number
+    {method} + removeEventListener(number): void
+    {method} + drawByHistory(history: History): void
+}
+
+class ListenerManager {
+    {field} - listeners: number[]
+    
+    {method} + ListenerManager(): ListenerManager
+    {method} + addEventListener(callback: (history: History) => void): number
+    {method} + removeEventListener(number): void
+    {method} + callback(history: History): void
 }
 
 class CanvasManager {
@@ -55,6 +67,8 @@ class CanvasManager {
     {method} + setLineWidth(width: number): void
     {method} + setSortOrder(sortOrder: number[]): boolean
     {method} - setEvent(canvas_: HTMLCanvasElement): void
+    {method} + registerListener(listener: (history:Hisotry) => void): void
+    {method} + unregisterListener(): void
 }
 
 class CircleGL {
@@ -195,6 +209,7 @@ class LineRender {
     {field} - pre: { x: number, y:number }
     {field} - history: LineHistory
     {field} - penRenders: PenInterface[]
+    {field} - listener: (history: History) => void
 
     {method} + LineRender(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, layerNum: number): LineRender
     {method} + changeMode(mode: PenStyle): void
@@ -205,6 +220,8 @@ class LineRender {
     {method} + start(pos: { x: number; y: number }, color?: HSV | RGB): void
     {method} + undo(hist: LineHistory): void
     {method} + update(pos: { x: number; y: number }): void
+    {method} + registerListener(listener: (history:Hisotry) => void): void
+    {method} + unregisterListener(): void
     {method} - drawLineByHistory(hist: LineHistory): void
 }
 

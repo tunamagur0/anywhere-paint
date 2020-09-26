@@ -1,3 +1,4 @@
+import { History } from './historyTypes';
 import AnywherePaint from './anywherePaint';
 
 const canvas: HTMLDivElement = document.getElementById(
@@ -5,6 +6,9 @@ const canvas: HTMLDivElement = document.getElementById(
 ) as HTMLDivElement;
 
 const awPaint: AnywherePaint = new AnywherePaint(canvas, 600, 400);
+const listener = awPaint.addEventListener((history: History) => {
+  console.log(history);
+});
 let currentLayer = 0;
 
 const button = document.getElementById('button') as HTMLButtonElement;

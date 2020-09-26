@@ -227,4 +227,12 @@ export default class CanvasManager {
     }
     return isValid;
   }
+
+  public registerListener(listener: (history: History) => void): void {
+    this.historyManager.registerListener(listener);
+  }
+
+  public unregisterListener(): void {
+    this.historyManager.unregisterListener();
+  }
 }
