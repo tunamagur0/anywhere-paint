@@ -5,6 +5,9 @@ import CanvasManager from './canvasManager';
 import ListenerManager from './listenerManager';
 import { History } from './historyTypes';
 
+export { HSV, RGB } from './colorUtil';
+export { PenStyle } from './penInterface';
+
 export default class AnywherePaint {
   private colorCircle: ColorCircle | null = null;
 
@@ -104,5 +107,9 @@ export default class AnywherePaint {
 
   public removeEventListener(listener: number): void {
     this.listenerManager.removeEventListener(listener);
+  }
+
+  public drawByHistory(history: History): void {
+    this.canvasManager.drawByHistory(history);
   }
 }

@@ -6,9 +6,19 @@ const canvas: HTMLDivElement = document.getElementById(
 ) as HTMLDivElement;
 
 const awPaint: AnywherePaint = new AnywherePaint(canvas, 600, 400);
+const histories: History[] = [];
 const listener = awPaint.addEventListener((history: History) => {
-  console.log(history);
+  histories.push(history);
 });
+
+const randomButton = document.getElementById('random') as HTMLButtonElement;
+randomButton.onclick = () => {
+  if (histories.length !== 0) {
+    const randomHistory =
+      histories[Math.floor(Math.random() * histories.length)];
+    awPaint.drawByHistory(randomHistory);
+  }
+};
 let currentLayer = 0;
 
 const button = document.getElementById('button') as HTMLButtonElement;
@@ -99,7 +109,7 @@ redo.onclick = () => {
 const remove = document.getElementById('remove-layer') as HTMLButtonElement;
 const removeLayerDiv = (layerNum: number) => {
   const num: number | null = awPaint.removeLayer(layerNum);
-  const option = document.querySelector('option:checked');
+  const option = document.querySelector('#select option:checked');
   if (!option) return;
   option.remove();
   if (num === null) {

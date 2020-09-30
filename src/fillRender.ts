@@ -99,9 +99,8 @@ export default class FillRender implements PenInterface {
 
   // eslint-disable-next-line class-methods-use-this
   drawByHistory(hist: LineHistory, ctx: CanvasRenderingContext2D): void {
-    if (this.width === -1 || this.height === -1) {
-      throw new Error('cannot call drawByHistory before start called');
-    }
+    this.width = ctx.canvas.width;
+    this.height = ctx.canvas.height;
 
     const img = ctx.getImageData(0, 0, this.width, this.height);
     let color: RGB;

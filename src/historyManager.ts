@@ -12,7 +12,7 @@ export default class HistoryManager {
 
   private listener: ((history: History) => void) | null = null;
 
-  public do(history: History): void {
+  public do(history: History, listen = true): void {
     const hist: History = { ...history };
     hist.info = {
       ...history.info,
@@ -52,7 +52,7 @@ export default class HistoryManager {
     this.stack = this.stack.slice(0, this.pointer);
     this.stack.push(hist);
     this.pointer += 1;
-    if (this.listener !== null && hist !== null) {
+    if (listen && this.listener !== null && hist !== null) {
       this.listener(hist);
     }
   }

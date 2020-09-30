@@ -116,4 +116,20 @@ export default class LineRender {
     }
     penRender.redo(hist, this.ctx, this.canvas);
   }
+
+  public drawByHistory(
+    hist: LineHistory,
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ): void {
+    const penRender: PenInterface | undefined = this.penRenders.get(
+      hist.info.mode
+    );
+    if (!penRender) {
+      throw new Error(`cannot find ${hist.info.mode}`);
+    }
+    const history = { ...hist };
+    history.info.snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    penRender.drawByHistory(history, ctx);
+  }
 }

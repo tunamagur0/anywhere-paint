@@ -9,9 +9,9 @@ module.exports = {
   output: {
     path: contentBase,
     filename: 'anywherePaint.js',
-    library: 'AnywherePaint',
+    library: '',
     libraryTarget: 'umd',
-    libraryExport: 'default',
+    libraryExport: '',
     globalObject: 'this',
   },
   resolve: {
