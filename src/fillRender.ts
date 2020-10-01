@@ -122,12 +122,19 @@ export default class FillRender implements PenInterface {
     while (stack.length !== 0) {
       const top = stack[0];
       stack.shift();
-      // eslint-disable-next-line no-continue
-      if (this.isSameColor(targetColor, top, imgData)) continue;
+      if (
+        this.isFilled(imgData, top) &&
+        this.isSameColor(targetColor, top, imgData)
+      )
+        // eslint-disable-next-line no-continue
+        continue;
       let lx = top.x;
       let rx = top.x;
       while (lx >= 0) {
-        if (!this.isSameColor(color, { x: lx, y: top.y }, imgData)) {
+        if (
+          this.isFilled(imgData, { x: lx, y: top.y }) &&
+          !this.isSameColor(color, { x: lx, y: top.y }, imgData)
+        ) {
           lx += 1;
           break;
         }
@@ -135,7 +142,10 @@ export default class FillRender implements PenInterface {
       }
       lx = Math.max(0, lx);
       while (rx < width) {
-        if (!this.isSameColor(color, { x: rx, y: top.y }, imgData)) {
+        if (
+          this.isFilled(imgData, { x: rx, y: top.y }) &&
+          !this.isSameColor(color, { x: rx, y: top.y }, imgData)
+        ) {
           rx -= 1;
           break;
         }
@@ -144,7 +154,7 @@ export default class FillRender implements PenInterface {
       rx = Math.min(width - 1, rx);
 
       // fill line
-      for (let i = lx - 1; i <= rx + 1; i += 1) {
+      for (let i = lx; i <= rx; i += 1) {
         const pIndex = (i + top.y * width) * 4;
         imgData.data[pIndex] = targetColor.r;
         imgData.data[pIndex + 1] = targetColor.g;
@@ -171,18 +181,35 @@ export default class FillRender implements PenInterface {
     dy: number,
     color: RGB
   ): void {
-    let isIn = this.isSameColor(color, { x: lx, y }, imgData);
+    let isIn =
+      !this.isFilled(imgData, { x: lx, y }) ||
+      this.isSameColor(color, { x: lx, y }, imgData);
     for (let i = lx + 1; i < rx; i += 1) {
-      if (isIn && !this.isSameColor(color, { x: i, y }, imgData)) {
+      if (
+        isIn &&
+        this.isFilled(imgData, { x: i, y }) &&
+        !this.isSameColor(color, { x: i, y }, imgData)
+      ) {
         stack.unshift({ x: i - 1, y, dy });
         isIn = false;
-      } else if (!isIn && this.isSameColor(color, { x: i, y }, imgData)) {
+      } else if (
+        !isIn &&
+        (!this.isFilled(imgData, { x: i, y }) ||
+          this.isSameColor(color, { x: i, y }, imgData))
+      ) {
         isIn = true;
       }
     }
     if (isIn) {
       stack.unshift({ x: rx - 1, y, dy });
     }
+  }
+
+  private isFilled(
+    imgData: ImageData,
+    point: { x: number; y: number }
+  ): boolean {
+    return imgData.data[(point.x + point.y * imgData.width) * 4 + 3] !== 0;
   }
 
   private isSameColor(
