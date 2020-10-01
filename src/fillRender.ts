@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { PenInterface } from './penInterface';
@@ -30,8 +31,6 @@ export default class FillRender implements PenInterface {
 
   private height = -1;
 
-  private fillDiff = 10;
-
   private isDrawing = false;
 
   end(): LineHistory | null {
@@ -48,7 +47,6 @@ export default class FillRender implements PenInterface {
   redo(
     hist: LineHistory,
     ctx: CanvasRenderingContext2D,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     canvas: HTMLCanvasElement
   ): void {
     this.drawByHistory(hist, ctx);
@@ -77,8 +75,7 @@ export default class FillRender implements PenInterface {
     );
     this.width = canvas.width;
     this.height = canvas.height;
-    this.bfs(this.history.info.snapshot, { x: info.x, y: info.y });
-    this.drawByHistory(this.history, ctx);
+    this.drawByHistory(history, ctx);
   }
 
   undo(
@@ -89,6 +86,7 @@ export default class FillRender implements PenInterface {
     if (hist.info.snapshot) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.putImageData(hist.info.snapshot as ImageData, 0, 0);
+      return;
     }
 
     this.drawByHistory(hist, ctx);
@@ -97,87 +95,106 @@ export default class FillRender implements PenInterface {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   update(info: { x: number; y: number; pressure: number }): void {}
 
-  // eslint-disable-next-line class-methods-use-this
   drawByHistory(hist: LineHistory, ctx: CanvasRenderingContext2D): void {
-    this.width = ctx.canvas.width;
-    this.height = ctx.canvas.height;
-
-    const img = ctx.getImageData(0, 0, this.width, this.height);
-    let color: RGB;
-    if (hist.info.color instanceof HSV) {
-      color = hsv2rgb(hist.info.color);
-    } else {
-      color = hist.info.color;
-    }
-
-    for (const path of hist.info.path) {
-      const index = (path.x + path.y * this.width) * 4;
-      img.data[index] = color.r;
-      img.data[index + 1] = color.g;
-      img.data[index + 2] = color.b;
-      img.data[index + 3] = 255;
-    }
-    ctx.putImageData(img, 0, 0);
+    const { width, height } = ctx.canvas;
+    const imgData = ctx.getImageData(0, 0, width, height);
+    this.seedFill(imgData, hist.info.path[0], hist.info.color);
+    ctx.putImageData(imgData, 0, 0);
   }
 
-  static getWidth(width: number, pressure: number): number {
-    return width * pressure;
-  }
-
-  private bfs(imgData: ImageData, point: { x: number; y: number }): void {
-    const queue: { x: number; y: number }[] = [];
+  private seedFill(
+    imgData: ImageData,
+    point: { x: number; y: number },
+    _targetColor: HSV | RGB
+  ): void {
+    const stack: { x: number; y: number; dy: number }[] = [];
     const { width, height } = imgData;
     const index: number = (point.x + point.y * width) * 4;
+    const targetColor: RGB =
+      _targetColor instanceof RGB ? _targetColor : hsv2rgb(_targetColor);
     const color: RGB = new RGB(
       imgData.data[index],
       imgData.data[index + 1],
       imgData.data[index + 2]
     );
-    const dxdy: [number, number][] = [
-      [-1, 0],
-      [0, -1],
-      [1, 0],
-      [0, 1],
-    ];
-    const isVisited: boolean[][] = new Array(width);
-    for (let w = 0; w < width; w += 1) {
-      isVisited[w] = new Array(height).fill(false);
-    }
 
-    const colorabs = (a: RGB, b: RGB): number =>
-      Math.sqrt((a.r - b.r) ** 2 + (a.g - b.g) ** 2 + (a.b - b.b) ** 2);
-    queue.unshift(point);
-    while (queue.length !== 0) {
-      const top = queue[queue.length - 1];
-      queue.pop();
-      const r = imgData.data[(top.x + top.y * width) * 4];
-      const g = imgData.data[(top.x + top.y * width) * 4 + 1];
-      const b = imgData.data[(top.x + top.y * width) * 4 + 2];
-
-      this.history.info.path.push({
-        ...top,
-        pressure: 1,
-      });
-      // if pixel color is white
-      if (colorabs(color, new RGB(r, g, b)) < this.fillDiff) {
-        for (const d of dxdy) {
-          const nx = top.x + d[0];
-          const ny = top.y + d[1];
-          if (
-            nx >= 0 &&
-            nx < width &&
-            ny >= 0 &&
-            ny < height &&
-            !isVisited[nx][ny]
-          ) {
-            isVisited[nx][ny] = true;
-            queue.unshift({
-              x: nx,
-              y: ny,
-            });
-          }
+    stack.unshift({ ...point, dy: 0 });
+    while (stack.length !== 0) {
+      const top = stack[0];
+      stack.shift();
+      // eslint-disable-next-line no-continue
+      if (this.isSameColor(targetColor, top, imgData)) continue;
+      let lx = top.x;
+      let rx = top.x;
+      while (lx >= 0) {
+        if (!this.isSameColor(color, { x: lx, y: top.y }, imgData)) {
+          lx += 1;
+          break;
         }
+        lx -= 1;
+      }
+      lx = Math.max(0, lx);
+      while (rx < width) {
+        if (!this.isSameColor(color, { x: rx, y: top.y }, imgData)) {
+          rx -= 1;
+          break;
+        }
+        rx += 1;
+      }
+      rx = Math.min(width - 1, rx);
+
+      // fill line
+      for (let i = lx - 1; i <= rx + 1; i += 1) {
+        const pIndex = (i + top.y * width) * 4;
+        imgData.data[pIndex] = targetColor.r;
+        imgData.data[pIndex + 1] = targetColor.g;
+        imgData.data[pIndex + 2] = targetColor.b;
+        imgData.data[pIndex + 3] = 255;
+      }
+
+      // scan next line
+      if (top.dy >= 0 && top.y < height - 1) {
+        this.scanLine(imgData, stack, lx, rx, top.y + 1, 0, color);
+      }
+      if (top.dy <= 0 && top.y > 0) {
+        this.scanLine(imgData, stack, lx, rx, top.y - 1, 0, color);
       }
     }
+  }
+
+  private scanLine(
+    imgData: ImageData,
+    stack: { x: number; y: number; dy: number }[],
+    lx: number,
+    rx: number,
+    y: number,
+    dy: number,
+    color: RGB
+  ): void {
+    let isIn = this.isSameColor(color, { x: lx, y }, imgData);
+    for (let i = lx + 1; i < rx; i += 1) {
+      if (isIn && !this.isSameColor(color, { x: i, y }, imgData)) {
+        stack.unshift({ x: i - 1, y, dy });
+        isIn = false;
+      } else if (!isIn && this.isSameColor(color, { x: i, y }, imgData)) {
+        isIn = true;
+      }
+    }
+    if (isIn) {
+      stack.unshift({ x: rx - 1, y, dy });
+    }
+  }
+
+  private isSameColor(
+    color: RGB,
+    point: { x: number; y: number },
+    imgData: ImageData
+  ): boolean {
+    const index = (point.x + point.y * imgData.width) * 4;
+    const r = imgData.data[index];
+    const g = imgData.data[index + 1];
+    const b = imgData.data[index + 2];
+    const color2 = new RGB(r, g, b);
+    return color.r === color2.r && color.g === color2.g && color.b === color2.b;
   }
 }
