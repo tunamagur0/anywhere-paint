@@ -37,6 +37,7 @@ module.exports = {
           compilerOptions: {
             outDir: 'lib',
           },
+          onlyCompileBundledFiles: true,
         },
       },
     ],

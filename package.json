@@ -17,22 +17,21 @@
   "files": [
     "lib",
     "README.md",
-    "pacakge.json",
-    "doc"
+    "pacakge.json"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/tunamagur0/anywhere-paint.git"
   },
   "scripts": {
-    "build": "npx webpack",
-    "build:lib": "npx webpack --config webpack.config.lib.js",
+    "build": "npx webpack --config webpack.config.lib.js",
+    "build:example": "npx webpack",
     "build:clean": "rm -rf lib/ dist/",
     "start": "npx webpack-dev-server --open",
     "lint": "npx eslint \"src/**/*.ts\" --quiet --fix",
     "test": "jest",
     "doc": "npx typedoc --out doc src",
-    "prepare": "npm run lint && npm run test && npm run doc && npm run build:clean && npm run build:lib"
+    "prepublishOnly": "npm run lint && npm run test && npm run doc && npm run build:clean && npm run build"
   },
   "author": {
     "name": "tunamagur0",
