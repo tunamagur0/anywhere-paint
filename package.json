@@ -31,7 +31,8 @@
     "lint": "npx eslint \"src/**/*.ts\" --quiet --fix",
     "test": "jest",
     "doc": "npx typedoc --out doc src",
-    "prepublishOnly": "npm run lint && npm run test && npm run doc && npm run build:clean && npm run build"
+    "prepublishOnly": "npm run lint && npm run test && npm run doc && npm run build:clean && npm run build",
+    "prepare": "npm run build"
   },
   "author": {
     "name": "tunamagur0",
