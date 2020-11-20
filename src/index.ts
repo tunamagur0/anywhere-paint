@@ -32,7 +32,6 @@ awPaint.createColorCircle(document.getElementById('circle') as HTMLDivElement);
 const pen = document.getElementById('pen') as HTMLSelectElement;
 pen.onchange = (e) => {
   const target = e.target as HTMLSelectElement;
-  console.log(target.selectedIndex);
   const ma: Map<number, string> = new Map([
     [0, 'Pencil'],
     [1, 'Eraser'],

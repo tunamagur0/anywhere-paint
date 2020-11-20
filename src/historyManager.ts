@@ -8,6 +8,8 @@ export default class HistoryManager {
 
   private cnts: Map<number, number> = new Map<number, number>();
 
+  private cntHistories: Map<number, number[]> = new Map<number, number[]>();
+
   private snapshotInterval = 10;
 
   private listener: ((history: History) => void) | null = null;
@@ -17,38 +19,60 @@ export default class HistoryManager {
     hist.info = {
       ...history.info,
     };
+
+    const rest: History[] = this.stack
+      .slice(this.pointer, this.stack.length)
+      .reverse();
+
+    // reduce cnts
+    for (const r of rest) {
+      const numHist: number[] | undefined = this.cntHistories.get(
+        r.info.layerNum
+      );
+
+      if (numHist !== undefined && numHist.length !== 0) {
+        numHist.pop();
+        const prevCnt = numHist[numHist.length - 1];
+        this.cnts.set(r.info.layerNum, prevCnt);
+        this.cntHistories.set(r.info.layerNum, numHist);
+      }
+    }
+
+    let cnt: number | undefined = this.cnts.get(hist.info.layerNum);
+    let cntHistory: number[] | undefined = this.cntHistories.get(
+      hist.info.layerNum
+    );
+
+    if (cntHistory === undefined) {
+      cntHistory = [0];
+    }
+    if (cnt === undefined) {
+      cnt = 0;
+    }
+
     switch (hist.target) {
       case 'LINE_HISTORY': {
         if (hist.info.color instanceof HSV) {
           hist.info.color = new HSV(...hist.info.color);
         }
 
-        const rest: History[] = this.stack.slice(
-          this.pointer,
-          this.stack.length
-        );
-        // reduce cnts
-        for (const r of rest) {
-          const num: number | undefined = this.cnts.get(r.info.layerNum);
-          if (num !== undefined) this.cnts.set(r.info.layerNum, num - 1);
-        }
-
-        let cnt: number | undefined = this.cnts.get(hist.info.layerNum);
-        if (cnt === undefined) {
-          cnt = -1;
-        }
-        this.cnts.set(hist.info.layerNum, cnt + 1);
-        if ((cnt + 1) % this.snapshotInterval !== 0) {
+        if (cnt % this.snapshotInterval !== 0) {
           hist.info.snapshot = null;
         }
+        cnt += 1;
         break;
       }
-      case 'LAYER_HISTORY':
+      case 'LAYER_HISTORY': {
+        cnt += this.snapshotInterval - (cnt % this.snapshotInterval);
         break;
+      }
       default:
         break;
     }
 
+    cntHistory.push(cnt);
+    this.cnts.set(hist.info.layerNum, cnt);
+    this.cntHistories.set(hist.info.layerNum, cntHistory);
     this.stack = this.stack.slice(0, this.pointer);
     this.stack.push(hist);
     this.pointer += 1;
@@ -76,12 +100,9 @@ export default class HistoryManager {
           tmpP -= 1;
           const current: History = { ...this.stack[tmpP] };
           current.info = { ...this.stack[tmpP].info };
-          if (current.target === 'LINE_HISTORY') {
-            if (top.info.layerNum === current.info.layerNum)
-              ret.unshift(current);
-            if (current.info.snapshot) {
-              break;
-            }
+          if (top.info.layerNum === current.info.layerNum) ret.unshift(current);
+          if (current.info.snapshot) {
+            break;
           }
           // eslint-disable-next-line no-constant-condition
         } while (true);
@@ -105,6 +126,7 @@ export default class HistoryManager {
     this.stack = [];
     this.pointer = 0;
     this.cnts = new Map<number, number>();
+    this.cntHistories = new Map<number, number[]>();
   }
 
   public registerListener(listener: (history: History) => void): void {
