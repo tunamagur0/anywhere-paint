@@ -4,5 +4,6 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  setupFiles: ['jest-canvas-mock'],
+  // setupFiles: ['jest-canvas-mock'],
+  setupFiles: ['<rootDir>/src/__mocks__/setup.ts'],
 };

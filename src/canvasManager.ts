@@ -227,4 +227,36 @@ export default class CanvasManager {
     }
     return isValid;
   }
+
+  public registerListener(listener: (history: History) => void): void {
+    this.historyManager.registerListener(listener);
+  }
+
+  public unregisterListener(): void {
+    this.historyManager.unregisterListener();
+  }
+
+  public drawByHistory(history: History): void {
+    switch (history.target) {
+      case 'LINE_HISTORY': {
+        const layers = this.layerManager.getLayers();
+        const { layerNum } = history.info;
+        const canvas = layers.canvas.get(layerNum);
+        const ctx = layers.ctx.get(layerNum);
+
+        if (canvas && ctx) {
+          this.lineRender.drawByHistory(history, ctx, canvas);
+        }
+        break;
+      }
+      case 'LAYER_HISTORY': {
+        const ret: number | null = this.layerManager.redo(history);
+        if (ret !== null) this.selectLayer(ret);
+        break;
+      }
+      default:
+        break;
+    }
+    this.historyManager.do(history, false);
+  }
 }

@@ -1,3 +1,4 @@
+import { History } from './historyTypes';
 import AnywherePaint from './anywherePaint';
 
 const canvas: HTMLDivElement = document.getElementById(
@@ -5,6 +6,19 @@ const canvas: HTMLDivElement = document.getElementById(
 ) as HTMLDivElement;
 
 const awPaint: AnywherePaint = new AnywherePaint(canvas, 600, 400);
+const histories: History[] = [];
+const listener = awPaint.addEventListener((history: History) => {
+  histories.push(history);
+});
+
+const randomButton = document.getElementById('random') as HTMLButtonElement;
+randomButton.onclick = () => {
+  if (histories.length !== 0) {
+    const randomHistory =
+      histories[Math.floor(Math.random() * histories.length)];
+    awPaint.drawByHistory(randomHistory);
+  }
+};
 let currentLayer = 0;
 
 const button = document.getElementById('button') as HTMLButtonElement;
@@ -18,7 +32,6 @@ awPaint.createColorCircle(document.getElementById('circle') as HTMLDivElement);
 const pen = document.getElementById('pen') as HTMLSelectElement;
 pen.onchange = (e) => {
   const target = e.target as HTMLSelectElement;
-  console.log(target.selectedIndex);
   const ma: Map<number, string> = new Map([
     [0, 'Pencil'],
     [1, 'Eraser'],
@@ -95,7 +108,7 @@ redo.onclick = () => {
 const remove = document.getElementById('remove-layer') as HTMLButtonElement;
 const removeLayerDiv = (layerNum: number) => {
   const num: number | null = awPaint.removeLayer(layerNum);
-  const option = document.querySelector('option:checked');
+  const option = document.querySelector('#select option:checked');
   if (!option) return;
   option.remove();
   if (num === null) {
