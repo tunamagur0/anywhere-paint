@@ -41,8 +41,8 @@ color is automatically picked when you draw lines.
 ### Undo, Redo
 
 ```
-awPaint.undo();
-awPaint.redo();
+awPaint.undo(): void;
+awPaint.redo(): void;
 ```
 
 ### Layers
@@ -52,7 +52,7 @@ You can only draw on selected layer.
 Unique number is assigned to each layer.
 
 ```
-awPaint.addLayer(layerNum?);
+awPaint.addLayer(layerNum?: undefined | number): number;
 ```
 
 If no arguments are specified, a new layer is added at the top.
@@ -60,44 +60,44 @@ Otherwise, a new layer is added on top of the layerNum.
 Returns unique number which is assigned to new layer.
 
 ```
-awPaint.removeLayer(layerNum);
+awPaint.removeLayer(layerNum: number): number | null;
 ```
 
 Remove specified layer.
 Returns newly selected layer number. If there is not any layers, this function returns null.
 
 ```
-awPaint.renameLayer(layerNum, layerName);
+awPaint.renameLayer(layerNum: number, layerName: string): void;
 ```
 
 You can assign layer name to each layer.
 
 ```
-awPaint.getLayerNames();
+awPaint.getLayerNames(): Map<number, string>;
 ```
 
 Returns Map<layerNum, layerName>.
 
 ```
-awPaint.selectLayer(layerNum);
+awPaint.selectLayer(layerNum: number): void;
 ```
 
 Select layer which you want to draw.
 
 ```
-awPaint.getLayerImages();
+awPaint.getLayerImages(): Map<number, string>;
 ```
 
 Returns Map<layerNum, DataURI>.
 
 ```
-awPaint.getSortOrder();
+awPaint.getSortOrder(): number[];
 ```
 
 Returns an array of layerNum sorted by layer overlap order.
 
 ```
-awPaint.setSortOrder(sortOrder);
+awPaint.setSortOrder(sortOrder: number[]): boolean;
 ```
 
 `sortOrder` is an array which includes layerNums.
@@ -111,13 +111,13 @@ Returns argument is valid or not.
 ### Line
 
 ```
-awPaint.setColor(r, g, b);
+awPaint.setColor(r: number, g: number, b: number): void;
 ```
 
 Set line color by r (0-255), g (0-255), b (0-255).
 
 ```
-awPaint.setLineWidth(px);
+awPaint.setLineWidth(px: number): void;
 ```
 
 Set line width(px).
@@ -125,7 +125,7 @@ Set line width(px).
 ### Image
 
 ```
-awPaint.getIntegratedImage();
+awPaint.getIntegratedImage(): string;
 ```
 
 Returns DataURI with a layer-integrated image. (png)
@@ -133,16 +133,39 @@ Returns DataURI with a layer-integrated image. (png)
 ### Mode
 
 ```
-awPaint.changeMode(style);
+awPaint.changeMode(style: "Pencil" | "Eraser" | "Fill"): void;
 ```
 
 Change drawing mode.
 style is "Pencil", "Eraser" or "Fill".
 
+### History
+
+```
+awPaint.addEventListener(callback: (history: History) => void);
+```
+
+Add callback that will be called when canvas is edited.
+The parameter of callback is command object of canvas operation.
+Returns listenerID.
+
+```
+awPaint.removeEventListener(listener: number): void;
+```
+
+Remove eventListener.
+
+```
+awPaint.drawByHistory(history: History): void;
+```
+
+Operate canvas using history.
+
 # Properties
 
 ```
 awPaint.selectingLayer
+
 ```
 
 layerNum which is selecting.
